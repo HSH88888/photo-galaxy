@@ -1,0 +1,13 @@
+# Personal database & logs
+photos.db
+*.db
+*.log
+
+# Python / PyInstaller build artifacts
+__pycache__/
+*.py[cod]
+build/
+dist/
+
+# Keep APK in the Android repository
+PhotoGalaxy.apk

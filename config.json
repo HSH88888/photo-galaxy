@@ -1,0 +1,6 @@
+{
+  "root": "H:\\D드라이브 사진원본저장소",
+  "extensions": [".jpg", ".jpeg", ".png", ".webp"],
+  "exclude_names": ["node_modules", ".git", "venv", ".venv", "__pycache__", "$recycle.bin", "system volume information"],
+  "port": 8765
+}
