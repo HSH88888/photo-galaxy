@@ -27,7 +27,8 @@ for _s in (sys.stdout, sys.stderr):
 IS_FROZEN = getattr(sys, "frozen", False)
 BUNDLE_DIR = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 APP_DIR = os.path.dirname(sys.executable) if IS_FROZEN else os.path.dirname(os.path.abspath(__file__))
-STATIC = os.path.join(BUNDLE_DIR, "static")
+_LOCAL_STATIC = os.path.join(APP_DIR, "static")
+STATIC = _LOCAL_STATIC if os.path.isdir(_LOCAL_STATIC) else os.path.join(BUNDLE_DIR, "static")
 DB_PATH = os.path.join(APP_DIR, "photos.db")
 CONFIG_PATH = os.path.join(APP_DIR, "config.json")
 
@@ -133,6 +134,18 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         url = urlparse(self.path)
+        if url.path == "/api/prefs":
+            length = int(self.headers.get("Content-Length", "0"))
+            raw = self.rfile.read(length) if length > 0 else b"{}"
+            try:
+                data = json.loads(raw.decode("utf-8"))
+                if isinstance(data, dict):
+                    prefs = CONFIG.setdefault("prefs", {})
+                    prefs.update(data)
+                    save_config()
+            except Exception:
+                pass
+            return self._send(b'{"ok":true}', "application/json; charset=utf-8")
         if url.path == "/api/pick-folder":
             chosen = pick_folder_dialog(CONFIG.get("root", ""))
             if chosen and os.path.isdir(chosen):
@@ -159,6 +172,9 @@ class Handler(SimpleHTTPRequestHandler):
                                   {"Content-Encoding": "gzip", "Cache-Control": "no-cache"})
             if url.path == "/api/status":
                 return self._send(json.dumps({"scanning": STATE["scanning"]}).encode(), "application/json")
+            if url.path == "/api/prefs":
+                body = json.dumps(CONFIG.get("prefs", {}), ensure_ascii=False).encode("utf-8")
+                return self._send(body, "application/json; charset=utf-8", {"Cache-Control": "no-cache"})
             if url.path == "/api/rescan":
                 if not STATE["scanning"]:
                     with LOCK:

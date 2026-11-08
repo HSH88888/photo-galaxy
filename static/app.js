@@ -59,7 +59,29 @@ function saveCustomizations() {
     localStorage.setItem('pg_custom_reps', JSON.stringify(customReps));
     localStorage.setItem('pg_custom_names', JSON.stringify(customNames));
   } catch (_) {}
+  fetch('/api/prefs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ customReps, customNames, thumbMaxVisible })
+  }).catch(() => {});
 }
+
+async function syncPrefsFromServer() {
+  try {
+    const r = await fetch('/api/prefs', { cache: 'no-store' });
+    if (!r.ok) return;
+    const p = await r.json();
+    if (p && typeof p === 'object') {
+      if (p.customReps && typeof p.customReps === 'object') customReps = { ...p.customReps, ...customReps };
+      if (p.customNames && typeof p.customNames === 'object') customNames = { ...p.customNames, ...customNames };
+      if (typeof p.thumbMaxVisible === 'number' && !localStorage.getItem('thumbMaxVisible')) {
+        setThumbMax(p.thumbMaxVisible);
+      }
+      if (T) { applyCustomReps(); requestRender(); }
+    }
+  } catch (_) {}
+}
+syncPrefsFromServer();
 
 let toastTimer = null;
 function showToast(msg) {
