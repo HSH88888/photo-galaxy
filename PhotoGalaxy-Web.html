@@ -1,0 +1,1573 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Photo Galaxy — 웹페이지(HTML) 버전</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; background: #0d0d17; color: #e8e8f0;
+  font-family: "Segoe UI", "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif; user-select: none;
+}
+#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#c.dragging { cursor: grabbing; }
+#c.pointer { cursor: pointer; }
+
+/* Bottom status line inside the bottom control dock */
+#topStatus {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 2px 8px; max-width: 96vw; pointer-events: none; text-shadow: 0 1px 4px #000d;
+}
+.brand { font-weight: 700; font-size: 13px; color: #c8c8e8; opacity: 0.92; white-space: nowrap; }
+#stats { color: #a0a0be; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Bottom control dock */
+#bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(0deg, #0d0d17f5 70%, #0d0d1700 100%);
+  pointer-events: none;
+}
+.bar-row {
+  pointer-events: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px; max-width: 1020px; width: 100%;
+  background: #171728eb; border: 1px solid #343454; border-radius: 14px;
+  padding: 8px 10px; box-shadow: 0 6px 26px #000b; backdrop-filter: blur(10px);
+}
+#help { color: #7a7a98; font-size: 11px; text-align: center; pointer-events: none; }
+
+button, .vbtn {
+  background: #23233a; color: #e8e8f0; border: 1px solid #3e3e64; border-radius: 9px;
+  padding: 8px 12px; font-size: 13px; font-weight: 500; cursor: pointer;
+  text-decoration: none; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+}
+button:hover, .vbtn:hover { background: #303052; }
+button:active, .vbtn:active { transform: scale(0.97); }
+button:disabled { opacity: .5; cursor: default; }
+
+.mode-group { display: inline-flex; background: #141424; border: 1px solid #3e3e64; border-radius: 9px; overflow: hidden; }
+.mode-btn { border: none; border-right: 1px solid #2e2e4a; border-radius: 0; background: transparent; padding: 8px 11px; font-size: 12.5px; color: #b5b5d0; }
+.mode-btn:last-child { border-right: none; }
+.mode-btn.active { background: #6c5ce7; color: #fff; font-weight: 600; }
+.mode-btn:hover:not(.active) { background: #262640; color: #fff; }
+
+/* Threshold popup — 100-unit presets + custom input */
+.thumb-wrap { position: relative; }
+#thumbPop {
+  position: fixed; bottom: 112px; left: 50%; transform: translateX(-50%); width: min(350px, 94vw);
+  background: #1c1c30; border: 1px solid #4a4a72; border-radius: 12px; padding: 12px 14px;
+  box-shadow: 0 10px 36px #000d; z-index: 25;
+}
+.tp-title { font-size: 12.5px; color: #ddd; margin-bottom: 10px; text-align: center; }
+.tp-title b { color: #a29bfe; }
+.tp-presets { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 10px; }
+.tp-presets button { flex: 1; padding: 8px 4px; font-size: 12px; white-space: nowrap; }
+.tp-presets button.active { background: #6c5ce7; border-color: #7c6cf7; color: #fff; font-weight: 600; }
+.tp-custom { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.tp-label { font-size: 12px; color: #b5b5d0; font-weight: 600; white-space: nowrap; margin-right: 2px; }
+.tp-custom button { padding: 6px 10px; font-weight: 600; font-size: 12px; }
+#tpInput {
+  flex: 1; min-width: 64px; background: #121220; color: #fff; border: 1px solid #4a4a72;
+  border-radius: 8px; padding: 6px 8px; font-size: 13.5px; font-weight: 600; text-align: center; outline: none;
+}
+#tpInput:focus { border-color: #6c5ce7; }
+.tp-row { display: flex; align-items: center; }
+#tpRange { width: 100%; accent-color: #6c5ce7; height: 22px; }
+
+/* Search box */
+.search-wrap { position: relative; flex: 1; min-width: 150px; max-width: 260px; }
+#search {
+  width: 100%; background: #141424; color: #e8e8f0; border: 1px solid #3e3e64; border-radius: 9px;
+  padding: 8px 11px; font-size: 13px; outline: none; font-family: inherit;
+}
+#search:focus { border-color: #6c5ce7; }
+#results {
+  position: absolute; bottom: calc(100% + 8px); right: 0; left: 0; min-width: 260px; max-height: 50vh;
+  overflow: auto; margin: 0; padding: 5px; list-style: none; background: #1c1c30;
+  border: 1px solid #4a4a72; border-radius: 10px; box-shadow: 0 8px 30px #000c; z-index: 25;
+}
+#results li { padding: 8px 10px; border-radius: 7px; cursor: pointer; font-size: 13px; }
+#results li:hover, #results li.sel { background: #2f2f52; }
+#results .p { color: #8a8aa5; font-size: 11px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+#tip {
+  position: fixed; pointer-events: none; background: #1a1a2bee; border: 1px solid #3a3a5c; border-radius: 8px;
+  padding: 6px 9px; font-size: 12px; max-width: 420px; z-index: 8; line-height: 1.45;
+}
+#tip b { color: #fff; }
+#tip span { color: #9a9ab5; }
+
+#toast {
+  position: fixed; left: 50%; bottom: 126px; transform: translateX(-50%);
+  background: #6c5ce7ee; color: #fff; padding: 9px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 600; box-shadow: 0 6px 20px #0009; z-index: 40; pointer-events: none;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed; inset: 0; background: #000b; z-index: 30;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay[hidden] { display: none; }
+.modal-card {
+  width: min(390px, 94vw); background: #1b1b2e; border: 1px solid #44446a;
+  border-radius: 16px; padding: 18px; box-shadow: 0 14px 44px #000d;
+}
+.modal-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; word-break: break-all; }
+.modal-sub { font-size: 12.5px; color: #9a9ab8; margin-bottom: 14px; line-height: 1.45; }
+.rename-box { display: flex; gap: 8px; margin-bottom: 12px; }
+.rename-box[hidden] { display: none; }
+#ctxRenameInput {
+  flex: 1; background: #121220; color: #fff; border: 1px solid #525282;
+  border-radius: 9px; padding: 10px 12px; font-size: 14px; outline: none;
+}
+.primary-btn { background: #6c5ce7; border-color: #7c6cf7; color: #fff; font-weight: 600; padding: 10px 16px; }
+.ctx-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.ctx-actions button {
+  width: 100%; justify-content: flex-start; padding: 13px 14px; font-size: 14px;
+  border-radius: 11px; background: #252540; border-color: #3d3d66;
+}
+.ctx-cancel { width: 100%; padding: 12px; font-size: 14px; background: #161626; color: #aaa; border-radius: 11px; }
+
+.rep-card { width: min(680px, 95vw); max-height: 84vh; display: flex; flex-direction: column; }
+.rep-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.rep-header .vbtn { flex: 0 0 auto; min-width: 90px; }
+.rep-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 10px; overflow-y: auto; padding: 6px 2px; max-height: 66vh;
+}
+.rep-item {
+  aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 3px solid #38385c;
+  cursor: pointer; position: relative; background: #121220; transition: transform 0.12s, border-color 0.12s;
+}
+.rep-item:hover, .rep-item:active { transform: scale(1.05); border-color: #a29bfe; }
+.rep-item.current { border-color: #00b894; box-shadow: 0 0 0 2px #00b89466; }
+.rep-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Fullscreen photo viewer */
+#viewer {
+  position: fixed; inset: 0; background: #05050af2; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+}
+#viewer[hidden] { display: none; }
+#vimg { max-width: 100vw; max-height: calc(100vh - 110px); object-fit: contain; user-select: none; margin-bottom: 64px; }
+
+.vclose-top {
+  position: fixed; top: calc(20px + env(safe-area-inset-top, 0px)); right: 16px;
+  width: 54px; height: 54px; border-radius: 50%; font-size: 24px; font-weight: 700;
+  background: #282844e6; color: #fff; border: 2px solid #5c5c8a; z-index: 22;
+  box-shadow: 0 4px 18px #000a;
+}
+.vnav {
+  position: fixed; top: 46%; transform: translateY(-50%); font-size: 36px;
+  width: 56px; height: 96px; background: #18182cc0; border: 1px solid #3e3e64; border-radius: 12px; z-index: 21;
+}
+#vprev { left: 10px; }
+#vnext { right: 10px; }
+
+#vbottom {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 22;
+  background: linear-gradient(0deg, #080812f8 75%, #08081200 100%);
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+#vinfo { font-size: 13px; color: #d8d8ec; text-align: center; max-width: 92vw; word-break: break-all; }
+#vtools { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; max-width: 540px; }
+.vbtn {
+  min-height: 48px; padding: 11px 18px; font-size: 15px; font-weight: 600;
+  border-radius: 12px; background: #262642; border: 1.5px solid #4e4e7a; flex: 1; min-width: 110px;
+}
+.vbtn-close { background: #c0392b; border-color: #e74c3c; color: #fff; }
+.vbtn-close:hover { background: #d64535; }
+
+/* Drag & drop highlight */
+body.drag-over::after {
+  content: "📂 여기에 사진 폴더나 이미지 파일을 놓으세요";
+  position: fixed; inset: 16px; border: 3px dashed #a29bfe; border-radius: 20px;
+  background: #141428cc; color: #fff; font-size: 20px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; z-index: 50; pointer-events: none;
+}
+
+@media (min-width: 600px) and (max-width: 1024px) {
+  .bar-row { max-width: 780px; padding: 10px 14px; gap: 10px; }
+  button, .mode-btn { padding: 9px 14px; font-size: 13.5px; }
+  .vbtn { min-height: 52px; font-size: 15.5px; }
+  .rep-grid { grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); }
+}
+
+@media (max-width: 599px) {
+  .bar-row { padding: 7px 8px; gap: 6px; border-radius: 12px; }
+  button, .mode-btn { padding: 7px 9px; font-size: 12px; }
+  .search-wrap { min-width: 120px; max-width: none; width: 100%; order: 10; }
+  #thumbPop { bottom: 146px; }
+  #toast { bottom: 152px; }
+  #help { font-size: 10.5px; }
+  .vnav { width: 44px; height: 76px; font-size: 28px; }
+  .vbtn { min-height: 46px; padding: 10px 12px; font-size: 14px; min-width: 95px; }
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- Hidden file inputs for standalone HTML mode -->
+<input id="dirInput" type="file" webkitdirectory multiple accept="image/*" hidden>
+<input id="filesInput" type="file" multiple accept="image/*" hidden>
+
+<!-- Welcome modal for choosing folder / photos in Web HTML version -->
+<div id="webStartOverlay" class="modal-overlay">
+  <div class="modal-card" style="width:min(430px, 94vw);">
+    <div class="modal-title" style="font-size:18px; margin-bottom:6px;">🌌 Photo Galaxy 웹(HTML) 버전</div>
+    <div class="modal-sub">
+      별도 프로그램이나 서버 설치 없이 브라우저에서 바로 작동합니다.<br>
+      사진은 외부로 전송되지 않으며 기기 내에서만 안전하게 처리됩니다.
+    </div>
+    <div class="ctx-actions">
+      <button type="button" id="btnStartDir" class="primary-btn" style="justify-content:center; font-size:15px;">
+        📁 사진 폴더 통째로 열기 (하위 폴더 포함)
+      </button>
+      <button type="button" id="btnStartFiles" style="justify-content:center; font-size:14.5px;">
+        🖼️ 사진 여러 장 직접 선택 (아이폰·모바일 사진첩)
+      </button>
+      <button type="button" id="btnStartDemo" style="justify-content:center; font-size:13.5px; color:#b8b8d8;">
+        ✨ 샘플 은하계로 먼저 체험해보기 (1,200장 데모)
+      </button>
+    </div>
+    <div style="font-size:11.5px; color:#7a7a98; text-align:center; margin-top:6px;">
+      💡 탐색기에서 사진 폴더를 이 창으로 <b>드래그 앤 드롭</b>해도 열립니다.
+    </div>
+  </div>
+</div>
+
+<footer id="bar">
+  <div id="topStatus">
+    <span class="brand">📷 Photo Galaxy Web</span>
+    <span id="stats">폴더 또는 사진을 선택해 주세요</span>
+  </div>
+  <div class="bar-row">
+    <div class="mode-group" id="modeGroup" title="분류 기준 선택">
+      <button type="button" class="mode-btn active" data-mode="folder">폴더별</button>
+      <button type="button" class="mode-btn" data-mode="month">연·월별</button>
+      <button type="button" class="mode-btn" data-mode="day">일별</button>
+    </div>
+
+    <div class="thumb-wrap">
+      <button type="button" id="btnThumbCfg" title="썸네일 표시 기준 수량 설정">🖼️ <span id="thumbVal">100</span>개</button>
+      <div id="thumbPop" hidden>
+        <div class="tp-title">화면에 보이는 사진이 <b><span id="tpCur">100</span>개 이하</b>일 때 썸네일 표시</div>
+        <div class="tp-presets">
+          <button type="button" data-v="100">100개</button>
+          <button type="button" data-v="200">200개</button>
+          <button type="button" data-v="300">300개</button>
+          <button type="button" data-v="400">400개</button>
+          <button type="button" data-v="500">500개</button>
+        </div>
+        <div class="tp-custom">
+          <span class="tp-label">임의설정</span>
+          <button type="button" id="tpMinus" title="100개 감소">−100</button>
+          <input id="tpInput" type="number" min="1" max="5000" step="10" value="100" aria-label="임의 수량 입력">
+          <button type="button" id="tpPlus" title="100개 증가">+100</button>
+        </div>
+        <div class="tp-row">
+          <input id="tpRange" type="range" min="50" max="1000" step="50" value="100">
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="btnFolder" title="사진 폴더 선택">📁 폴더</button>
+    <button type="button" id="btnPickPhotos" title="사진 여러 장 선택">📷 사진선택</button>
+    <button type="button" id="btnFit" title="전체 보기 (Home)">전체</button>
+
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="폴더·연도 검색 (예: 2024, 여행)" autocomplete="off">
+      <ul id="results" hidden></ul>
+    </div>
+  </div>
+  <div id="help">휠/두손가락: 확대·축소 · 드래그: 이동 · 클릭/탭: 열기 · 우클릭/길게누르기: 대표사진·이름 변경</div>
+</footer>
+
+<div id="tip" hidden></div>
+<div id="toast" hidden></div>
+
+<!-- Long-press / Right-click context menu modal -->
+<div id="ctxOverlay" class="modal-overlay" hidden>
+  <div id="ctxCard" class="modal-card">
+    <div id="ctxTitle" class="modal-title"></div>
+    <div id="ctxSub" class="modal-sub"></div>
+    <div id="ctxRenameBox" class="rename-box" hidden>
+      <input id="ctxRenameInput" type="text" placeholder="새 표시 이름 입력">
+      <button type="button" id="ctxRenameSave" class="primary-btn">저장</button>
+    </div>
+    <div id="ctxActions" class="ctx-actions"></div>
+    <button type="button" id="ctxCancel" class="ctx-cancel">닫기</button>
+  </div>
+</div>
+
+<!-- Representative photo picker modal -->
+<div id="repOverlay" class="modal-overlay" hidden>
+  <div id="repCard" class="modal-card rep-card">
+    <div class="rep-header">
+      <div>
+        <div id="repTitle" class="modal-title">대표 사진 선택</div>
+        <div id="repSub" class="modal-sub">원하는 사진을 탭하면 폴더 대표 원 이미지로 적용됩니다</div>
+      </div>
+      <button type="button" id="repClose" class="vbtn vbtn-close">✕ 닫기</button>
+    </div>
+    <div id="repGrid" class="rep-grid"></div>
+  </div>
+</div>
+
+<!-- Fullscreen photo viewer -->
+<div id="viewer" hidden>
+  <button type="button" id="vcloseTop" class="vclose-top" title="닫기 (Esc)">✕</button>
+  <img id="vimg" alt="">
+  <button type="button" id="vprev" class="vnav" title="이전 (←)">‹</button>
+  <button type="button" id="vnext" class="vnav" title="다음 (→)">›</button>
+  <div id="vbottom">
+    <div id="vinfo"></div>
+    <div id="vtools">
+      <button type="button" id="vorig" class="vbtn" title="새 탭에서 원본 보기">📂 원본 열기</button>
+      <button type="button" id="vsetRep" class="vbtn" title="현재 폴더의 대표 사진으로 지정">⭐ 대표사진 지정</button>
+      <button type="button" id="vclose" class="vbtn vbtn-close" title="닫기 (Esc)">✕ 닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const $ = (q) => document.querySelector(q);
+const canvas = $('#c');
+const ctx = canvas.getContext('2d');
+
+const COLORS = ['#6c5ce7', '#e74c3c', '#f39c12', '#27ae60', '#3498db', '#e84393', '#00b894', '#fdcb6e', '#a29bfe', '#fd79a8'];
+const P = 1;
+const AREA = 2.35 * 2.35;
+const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+const LEVEL_SIZE = [160, 512, 1600];
+const LEVEL_CAP = [3000, 160, 16];
+const MAX_INFLIGHT = 8;
+const IMG_EXT = /\.(jpe?g|png|webp|gif|bmp|avif|heic|heif)$/i;
+
+const _savedThumbMax = +(localStorage.getItem('thumbMaxVisible') || 100);
+let thumbMaxVisible = Math.max(1, Math.min(5000, _savedThumbMax === 130 ? 100 : _savedThumbMax));
+
+let W = 0, H = 0, DPR = 1;
+let T = null;
+let N = 0, NP = 0;
+let parent, start, count, total, depth, rep, defaultRep, children, subEnd;
+let fx, fy, dir, repR, r0, coreR, subR, dist, span, encX, encY;
+let px, py, pf;
+const cam = { s: 1, tx: 0, ty: 0 };
+let minScale = 0.001;
+
+// Standalone Web state: rawentries = [{ name, relDir, mtime, file, demoSeed }]
+let rawEntries = [];
+let rootLabel = '내 사진';
+let currentMode = 'folder';
+let orderedEntries = []; // aligned with photo IDs 0..NP-1
+
+let customReps = {};
+let customNames = {};
+try { customReps = JSON.parse(localStorage.getItem('pg_custom_reps') || '{}'); } catch (_) {}
+try { customNames = JSON.parse(localStorage.getItem('pg_custom_names') || '{}'); } catch (_) {}
+
+function saveCustomizations() {
+  try {
+    localStorage.setItem('pg_custom_reps', JSON.stringify(customReps));
+    localStorage.setItem('pg_custom_names', JSON.stringify(customNames));
+  } catch (_) {}
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 2200);
+}
+
+const naturalCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+/* --------------------------------------------------- build tree in browser */
+
+function buildTreeFromRawEntries(mode) {
+  currentMode = mode;
+  updateModeButtons(mode);
+
+  const rootNode = { name: rootLabel, children: new Map(), photos: [], id: 0, parent: -1, start: 0, count: 0, total: 0 };
+
+  for (const item of rawEntries) {
+    let parts = [];
+    if (mode === 'month' || mode === 'day') {
+      const dt = new Date(item.mtime || Date.now());
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const d = String(dt.getDate()).padStart(2, '0');
+      parts = [`${y}년`, `${m}월`];
+      if (mode === 'day') parts.push(`${d}일`);
+    } else {
+      parts = item.relDir ? item.relDir.split('/').filter(Boolean) : [];
+    }
+
+    let cur = rootNode;
+    for (const part of parts) {
+      let nxt = cur.children.get(part);
+      if (!nxt) {
+        nxt = { name: part, children: new Map(), photos: [], id: 0, parent: -1, start: 0, count: 0, total: 0 };
+        cur.children.set(part, nxt);
+      }
+      cur = nxt;
+    }
+    cur.photos.push(item);
+  }
+
+  const orderedFolders = [];
+  orderedEntries = [];
+
+  function dfs(node, parentId) {
+    node.id = orderedFolders.length;
+    node.parent = parentId;
+    orderedFolders.push(node);
+    node.photos.sort((a, b) => naturalCollator.compare(a.name, b.name));
+    node.start = orderedEntries.length;
+    node.count = node.photos.length;
+    for (const p of node.photos) orderedEntries.push(p);
+
+    const keys = Array.from(node.children.keys()).sort(naturalCollator.compare);
+    for (const k of keys) dfs(node.children.get(k), node.id);
+  }
+
+  dfs(rootNode, -1);
+
+  for (let i = orderedFolders.length - 1; i >= 0; i--) {
+    const f = orderedFolders[i];
+    f.total += f.count;
+    if (f.parent >= 0) orderedFolders[f.parent].total += f.total;
+  }
+
+  T = {
+    root: rootLabel,
+    rootName: rootLabel,
+    mode,
+    version: Date.now(),
+    folders: orderedFolders.map((f) => [f.parent, f.name, f.start, f.count, f.total]),
+    photos: orderedEntries.map((p) => p.name)
+  };
+
+  cache.clear();
+  levelCount.fill(0);
+  layout();
+
+  const unitLabel = mode === 'month' ? '연·월 그룹' : mode === 'day' ? '일별 그룹' : '폴더';
+  const withPhotos = count.reduce((a, c) => a + (c > 0 ? 1 : 0), 0);
+  $('#stats').textContent = `${T.root}  ·  ${unitLabel} ${withPhotos.toLocaleString()}개  ·  사진 ${NP.toLocaleString()}장`;
+  fitAll(false);
+}
+
+function ingestFileList(fileList, defaultRootName) {
+  const arr = [];
+  let detectedRoot = defaultRootName || '선택한 사진';
+  for (let i = 0; i < fileList.length; i++) {
+    const f = fileList[i];
+    if (!f || (!f.type.startsWith('image/') && !IMG_EXT.test(f.name))) continue;
+    const rel = (f.webkitRelativePath || '').replace(/\\/g, '/');
+    let relDir = '';
+    if (rel.includes('/')) {
+      const segs = rel.split('/');
+      if (segs.length >= 2) {
+        detectedRoot = segs[0] || detectedRoot;
+        relDir = segs.slice(1, -1).join('/');
+      }
+    }
+    arr.push({
+      name: f.name,
+      relDir,
+      mtime: f.lastModified || Date.now(),
+      file: f,
+      demoSeed: null
+    });
+  }
+  if (!arr.length) {
+    showToast('선택한 항목에 이미지 파일이 없습니다');
+    return;
+  }
+  rawEntries = arr;
+  rootLabel = detectedRoot;
+  $('#webStartOverlay').hidden = true;
+  // If user selected flat files without folders, default to month view
+  const hasSubfolders = arr.some((x) => x.relDir.length > 0);
+  buildTreeFromRawEntries(hasSubfolders ? currentMode : 'month');
+  showToast(`사진 ${arr.length.toLocaleString()}장을 불러왔습니다`);
+}
+
+function loadDemoGalaxy() {
+  const arr = [];
+  const places = ['제주도 여행', '가족 모임', '도쿄 스냅', '부산 바다', '가을 단풍', '생일 파티', '캠핑 기록', '반려동물'];
+  let idx = 0;
+  for (let y = 2019; y <= 2026; y++) {
+    for (let m = 1; m <= 12; m += 2) {
+      const place = places[(y + m) % places.length];
+      const cnt = 12 + ((y * 7 + m * 13) % 28);
+      for (let k = 1; k <= cnt; k++) {
+        idx++;
+        const day = 1 + ((k * 3) % 27);
+        const dt = new Date(y, m - 1, day, 12, 0, 0).getTime();
+        arr.push({
+          name: `IMG_${y}${String(m).padStart(2, '0')}${String(day).padStart(2, '0')}_${String(idx).padStart(4, '0')}.JPG`,
+          relDir: `${y}년 추억/${place}`,
+          mtime: dt,
+          file: null,
+          demoSeed: idx
+        });
+      }
+    }
+  }
+  rawEntries = arr;
+  rootLabel = '샘플 사진첩';
+  $('#webStartOverlay').hidden = true;
+  buildTreeFromRawEntries('folder');
+  showToast(`샘플 사진 ${arr.length.toLocaleString()}장이 생성되었습니다`);
+}
+
+/* --------------------------------------------------- tree layout & geometry */
+
+function rawFolderPath(i) {
+  const parts = [];
+  for (; i > 0; i = parent[i]) parts.push(T.folders[i][1]);
+  return parts.reverse().join('/');
+}
+
+function folderKey(i) {
+  return `${T.mode || 'folder'}:${rawFolderPath(i)}`;
+}
+
+function folderDisplayName(i) {
+  return customNames[folderKey(i)] || T.folders[i][1];
+}
+
+function folderPath(i) {
+  const parts = [];
+  for (; i > 0; i = parent[i]) parts.push(folderDisplayName(i));
+  return parts.reverse().join(' › ') || T.rootName;
+}
+
+function applyCustomReps() {
+  for (let i = 0; i < N; i++) rep[i] = defaultRep[i];
+  for (let i = 0; i < N; i++) {
+    const wantedName = customReps[folderKey(i)];
+    if (!wantedName) continue;
+    const pStart = start[i];
+    const lastFolder = subEnd[i];
+    const pEnd = start[lastFolder] + count[lastFolder];
+    for (let id = pStart; id < pEnd; id++) {
+      if (T.photos[id] === wantedName) {
+        rep[i] = id;
+        break;
+      }
+    }
+  }
+}
+
+function layout() {
+  const fl = T.folders;
+  N = fl.length; NP = T.photos.length;
+  parent = new Int32Array(N); start = new Int32Array(N); count = new Int32Array(N);
+  total = new Int32Array(N); depth = new Int32Array(N);
+  rep = new Int32Array(N).fill(-1); defaultRep = new Int32Array(N).fill(-1);
+  subEnd = new Int32Array(N);
+  children = Array.from({ length: N }, () => []);
+  for (let i = 0; i < N; i++) {
+    const [p, , st, c, t] = fl[i];
+    parent[i] = p; start[i] = st; count[i] = c; total[i] = t; subEnd[i] = i;
+    if (p >= 0) { children[p].push(i); depth[i] = depth[p] + 1; }
+  }
+  for (let i = N - 1; i >= 0; i--) {
+    if (children[i].length) subEnd[i] = subEnd[children[i][children[i].length - 1]];
+    if (count[i] > 0) defaultRep[i] = start[i];
+    else for (const c of children[i]) if (defaultRep[c] >= 0) { defaultRep[i] = defaultRep[c]; break; }
+  }
+  applyCustomReps();
+
+  fx = new Float64Array(N); fy = new Float64Array(N); dir = new Float64Array(N);
+  repR = new Float64Array(N); r0 = new Float64Array(N); coreR = new Float64Array(N);
+  subR = new Float64Array(N); dist = new Float64Array(N); span = new Float64Array(N);
+  encX = new Float64Array(N); encY = new Float64Array(N);
+  const lx = new Float64Array(N), ly = new Float64Array(N), lang = new Float64Array(N);
+  const ox = new Float64Array(N), oy = new Float64Array(N);
+  const ROOT_SPAN = Math.PI * 2 * 0.985, SUB_SPAN = Math.PI * 1.25;
+
+  for (let i = N - 1; i >= 0; i--) {
+    repR[i] = 3 + 2.4 * Math.pow(total[i], 0.45);
+    r0[i] = repR[i] + 1.6;
+    coreR[i] = count[i] > 0 ? Math.sqrt(r0[i] * r0[i] + count[i] * AREA / Math.PI) + 1.2 : repR[i] + 1;
+    const ch = children[i];
+    if (!ch.length) { subR[i] = coreR[i]; continue; }
+    const Rs = ch.map((c) => subR[c] + 1.5 + 0.02 * subR[c]);
+    let maxR = 0, sumR = 0;
+    for (const r of Rs) { if (r > maxR) maxR = r; sumR += r; }
+    const maxSpan = i === 0 ? ROOT_SPAN : SUB_SPAN;
+    let d = Math.max(coreR[i] + maxR + 3 + 0.1 * coreR[i], 2 * sumR / maxSpan);
+    let sp = 0;
+    for (let it = 0; it < 600; it++) {
+      sp = 0;
+      for (const r of Rs) sp += 2 * Math.asin(Math.min(1, r / d));
+      if (sp <= maxSpan) break;
+      d *= 1.02;
+    }
+    dist[i] = d; span[i] = sp;
+    const target = i === 0 ? Math.PI * 2 : Math.min(maxSpan, sp * 1.15);
+    const k = target / sp;
+    let a = i === 0 ? -Math.PI / 2 : -target / 2;
+    let x0 = -coreR[i], x1 = coreR[i], y0 = -coreR[i], y1 = coreR[i];
+    const ecs = [];
+    ch.forEach((c, n) => {
+      const th = 2 * Math.asin(Math.min(1, Rs[n] / d)) * k, ac = a + th / 2;
+      const ca = Math.cos(ac), sa = Math.sin(ac);
+      const ex = d * ca, ey = d * sa;
+      lx[c] = ex - (ca * ox[c] - sa * oy[c]);
+      ly[c] = ey - (sa * ox[c] + ca * oy[c]);
+      lang[c] = ac;
+      ecs.push([ex, ey, subR[c]]);
+      x0 = Math.min(x0, ex - subR[c]); x1 = Math.max(x1, ex + subR[c]);
+      y0 = Math.min(y0, ey - subR[c]); y1 = Math.max(y1, ey + subR[c]);
+      a += th;
+    });
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    let R = Math.hypot(cx, cy) + coreR[i];
+    for (const [ex, ey, sr] of ecs) R = Math.max(R, Math.hypot(ex - cx, ey - cy) + sr);
+    ox[i] = cx; oy[i] = cy; subR[i] = R;
+  }
+
+  for (let i = 1; i < N; i++) {
+    const p = parent[i], ca = Math.cos(dir[p]), sa = Math.sin(dir[p]);
+    fx[i] = fx[p] + ca * lx[i] - sa * ly[i];
+    fy[i] = fy[p] + sa * lx[i] + ca * ly[i];
+    dir[i] = dir[p] + lang[i];
+  }
+  for (let i = 0; i < N; i++) {
+    const ca = Math.cos(dir[i]), sa = Math.sin(dir[i]);
+    encX[i] = fx[i] + ca * ox[i] - sa * oy[i];
+    encY[i] = fy[i] + sa * ox[i] + ca * oy[i];
+  }
+
+  px = new Float32Array(NP); py = new Float32Array(NP); pf = new Int32Array(NP);
+  for (let i = 0; i < N; i++) {
+    const c = count[i];
+    if (!c) continue;
+    const rr = r0[i] * r0[i];
+    for (let k = 0; k < c; k++) {
+      const id = start[i] + k;
+      const r = Math.sqrt(rr + (k + 0.5) * AREA / Math.PI);
+      const a = k * GOLDEN + dir[i];
+      px[id] = fx[i] + r * Math.cos(a);
+      py[id] = fy[i] + r * Math.sin(a);
+      pf[id] = i;
+    }
+  }
+}
+
+/* ------------------------------------------- client-side thumbnail decoding */
+
+const cache = new Map();
+const levelCount = [0, 0, 0];
+let inflight = 0, frame = 0;
+
+function key(id, lvl) { return id * 4 + lvl; }
+
+function desiredLevel(sizePx) {
+  const d = sizePx * DPR;
+  if (d < 9) return -1;
+  if (d <= 190) return 0;
+  if (d <= 620) return 1;
+  return 2;
+}
+
+function getImg(id, lvl, pri, wanted) {
+  let best = null;
+  for (let l = lvl; l >= 0; l--) {
+    const e = cache.get(key(id, l));
+    if (e && e.st === 1) { e.t = frame; best = e.img; break; }
+  }
+  const want = cache.get(key(id, lvl));
+  if (!want) wanted.push({ id, lvl, pri });
+  else if (want.st === 0) want.t = frame;
+  return best;
+}
+
+function renderDemoThumb(seed, sz) {
+  const c = document.createElement('canvas');
+  c.width = c.height = sz;
+  const g = c.getContext('2d');
+  g.beginPath(); g.arc(sz / 2, sz / 2, sz / 2, 0, Math.PI * 2); g.clip();
+  const h1 = (seed * 47) % 360, h2 = (h1 + 60) % 360;
+  const grad = g.createLinearGradient(0, 0, sz, sz);
+  grad.addColorStop(0, `hsl(${h1}, 70%, 52%)`);
+  grad.addColorStop(1, `hsl(${h2}, 75%, 30%)`);
+  g.fillStyle = grad;
+  g.fillRect(0, 0, sz, sz);
+  // Mountain & sun silhouette
+  g.fillStyle = 'rgba(255,255,255,0.82)';
+  g.beginPath();
+  g.arc(sz * (0.3 + ((seed * 19) % 40) / 100), sz * 0.34, sz * 0.13, 0, Math.PI * 2);
+  g.fill();
+  g.fillStyle = 'rgba(15,15,30,0.55)';
+  g.beginPath();
+  g.moveTo(0, sz);
+  g.lineTo(sz * 0.35, sz * 0.55);
+  g.lineTo(sz * 0.68, sz * 0.75);
+  g.lineTo(sz * 0.85, sz * 0.58);
+  g.lineTo(sz, sz);
+  g.closePath();
+  g.fill();
+  return c;
+}
+
+async function fetchImg(id, lvl) {
+  const entry = orderedEntries[id];
+  if (!entry) throw new Error('missing');
+  const targetSz = LEVEL_SIZE[lvl];
+  if (entry.demoSeed != null) {
+    return renderDemoThumb(entry.demoSeed, targetSz);
+  }
+  const file = entry.file;
+  let bmp;
+  if (window.createImageBitmap) {
+    bmp = await createImageBitmap(file);
+  } else {
+    const u = URL.createObjectURL(file);
+    try {
+      bmp = await new Promise((res, rej) => {
+        const im = new Image();
+        im.onload = () => res(im);
+        im.onerror = rej;
+        im.src = u;
+      });
+    } finally {
+      URL.revokeObjectURL(u);
+    }
+  }
+  const w = bmp.naturalWidth || bmp.width, h = bmp.naturalHeight || bmp.height;
+  const side = Math.min(w, h);
+  const sz = Math.max(1, Math.min(side, targetSz));
+  const c = document.createElement('canvas');
+  c.width = c.height = sz;
+  const g = c.getContext('2d');
+  g.imageSmoothingQuality = 'high';
+  g.beginPath(); g.arc(sz / 2, sz / 2, sz / 2, 0, Math.PI * 2); g.clip();
+  g.drawImage(bmp, (w - side) / 2, (h - side) / 2, side, side, 0, 0, sz, sz);
+  if (bmp.close) bmp.close();
+  return c;
+}
+
+function pump(wanted) {
+  if (inflight >= MAX_INFLIGHT || !wanted.length) return;
+  wanted.sort((a, b) => b.pri - a.pri);
+  for (const w of wanted) {
+    if (inflight >= MAX_INFLIGHT) break;
+    const k = key(w.id, w.lvl);
+    if (cache.has(k)) continue;
+    const e = { st: 0, img: null, t: frame, lvl: w.lvl };
+    cache.set(k, e);
+    inflight++;
+    fetchImg(w.id, w.lvl)
+      .then((img) => { e.img = img; e.st = 1; levelCount[w.lvl]++; evict(w.lvl); })
+      .catch(() => { e.st = 2; })
+      .finally(() => { inflight--; requestRender(); });
+  }
+}
+
+function evict(lvl) {
+  if (levelCount[lvl] <= LEVEL_CAP[lvl] * 1.1) return;
+  const list = [];
+  for (const [k, e] of cache) if (e.lvl === lvl && e.st === 1 && e.t < frame) list.push([k, e.t]);
+  list.sort((a, b) => a[1] - b[1]);
+  const drop = levelCount[lvl] - LEVEL_CAP[lvl];
+  for (let j = 0; j < drop && j < list.length; j++) { cache.delete(list[j][0]); levelCount[lvl]--; }
+}
+
+/* ---------------------------------------------------------------- render */
+
+let renderQueued = false;
+function requestRender() {
+  if (renderQueued) return;
+  renderQueued = true;
+  requestAnimationFrame(() => { renderQueued = false; render(); });
+}
+
+function getBarHeight() {
+  const b = $('#bar');
+  return b ? b.offsetHeight : 80;
+}
+
+function resize() {
+  const oldW = W;
+  const oldCy = oldW > 0 ? usableCenterY() : 0;
+  const oldMinDim = oldW > 0 ? usableMinDim() : 0;
+  DPR = window.devicePixelRatio || 1;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+  if (oldW > 0 && T && subR && subR[0] > 0) {
+    const wx = (oldW / 2 - cam.tx) / cam.s;
+    const wy = (oldCy - cam.ty) / cam.s;
+    const newMinDim = usableMinDim();
+    minScale = newMinDim / (2 * subR[0]) * 0.4;
+    const ratio = newMinDim / Math.max(1, oldMinDim);
+    setCamera(wx, wy, Math.max(minScale, Math.min(400, cam.s * ratio)));
+  }
+  requestRender();
+}
+
+function drawCircleImg(img, x, y, r) { ctx.drawImage(img, x - r, y - r, r * 2, r * 2); }
+
+function render() {
+  frame++;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#0d0d17';
+  ctx.fillRect(0, 0, W, H);
+  if (!T) return;
+  ctx.imageSmoothingQuality = 'medium';
+  const { s, tx, ty } = cam;
+  const wanted = [];
+  const cx = W / 2, cy = (H - getBarHeight()) / 2;
+  const inView = (x, y, r) => x + r > 0 && x - r < W && y + r > 0 && y - r < H;
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(124,108,255,0.38)';
+  ctx.beginPath();
+  for (let i = 1; i < N; i++) {
+    const p = parent[i];
+    const x0 = fx[p] * s + tx, y0 = fy[p] * s + ty, x1 = fx[i] * s + tx, y1 = fy[i] * s + ty;
+    const da = p === 0 ? dir[i] : dir[p];
+    const qx = (fx[p] + Math.cos(da) * dist[p] * 0.5) * s + tx, qy = (fy[p] + Math.sin(da) * dist[p] * 0.5) * s + ty;
+    if (Math.max(x0, x1, qx) < 0 || Math.min(x0, x1, qx) > W || Math.max(y0, y1, qy) < 0 || Math.min(y0, y1, qy) > H) continue;
+    ctx.moveTo(x0, y0);
+    ctx.quadraticCurveTo(qx, qy, x1, y1);
+  }
+  ctx.stroke();
+
+  const pr = P * s;
+  const rawPlvl = desiredLevel(pr * 2);
+  let visPhotos = 0;
+  if (rawPlvl >= 0 && pr >= 0.6) {
+    for (let i = 0; i < N && visPhotos <= thumbMaxVisible; i++) {
+      if (!count[i]) continue;
+      const x = fx[i] * s + tx, y = fy[i] * s + ty;
+      if (!inView(x, y, coreR[i] * s)) continue;
+      const a = start[i], b = a + count[i];
+      for (let id = a; id < b; id++) {
+        const sx = px[id] * s + tx, sy = py[id] * s + ty;
+        if (sx >= -pr && sx <= W + pr && sy >= -pr && sy <= H + pr) {
+          if (++visPhotos > thumbMaxVisible) break;
+        }
+      }
+    }
+  }
+  const plvl = visPhotos <= thumbMaxVisible ? rawPlvl : -1;
+
+  if (pr >= 0.6) {
+    for (let i = 0; i < N; i++) {
+      if (!count[i]) continue;
+      const x = fx[i] * s + tx, y = fy[i] * s + ty;
+      if (!inView(x, y, coreR[i] * s)) continue;
+      const col = COLORS[depth[i] % COLORS.length];
+      const a = start[i], b = a + count[i];
+      if (plvl < 0) {
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        const step = pr < 1.3 ? Math.max(1, Math.floor(1.5 / pr)) : 1;
+        const r = Math.max(0.9, pr * 0.9);
+        for (let id = a; id < b; id += step) {
+          const sx = px[id] * s + tx, sy = py[id] * s + ty;
+          if (sx < -r || sx > W + r || sy < -r || sy > H + r) continue;
+          ctx.moveTo(sx + r, sy);
+          ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        }
+        ctx.fill();
+      } else {
+        for (let id = a; id < b; id++) {
+          const sx = px[id] * s + tx, sy = py[id] * s + ty;
+          if (sx < -pr || sx > W + pr || sy < -pr || sy > H + pr) continue;
+          const pri = 1000 / (1 + Math.hypot(sx - cx, sy - cy)) + pr;
+          const img = getImg(id, plvl, pri, wanted);
+          if (img) {
+            drawCircleImg(img, sx, sy, pr * 0.96);
+          } else {
+            ctx.fillStyle = col;
+            ctx.beginPath(); ctx.arc(sx, sy, pr * 0.9, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+      }
+    }
+  }
+
+  for (let i = 0; i < N; i++) {
+    const x = fx[i] * s + tx, y = fy[i] * s + ty;
+    const rr = repR[i] * s, cr = coreR[i] * s;
+    if (!inView(x, y, cr)) continue;
+    const col = COLORS[depth[i] % COLORS.length];
+
+    if (count[i] > 0 && cr > rr + 2) {
+      ctx.strokeStyle = col + '33';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x, y, cr, 0, Math.PI * 2); ctx.stroke();
+    }
+    if (rr < 1.2) continue;
+
+    let drawn = false;
+    if (rep[i] >= 0) {
+      const flvl = desiredLevel(rr * 2);
+      if (flvl >= 0) {
+        const img = getImg(rep[i], flvl, 1e6 + rr, wanted);
+        if (img) { drawCircleImg(img, x, y, rr); drawn = true; }
+      }
+    }
+    if (!drawn) {
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.arc(x, y, rr, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.strokeStyle = col;
+    ctx.lineWidth = Math.min(3, Math.max(1.2, rr * 0.08));
+    ctx.beginPath(); ctx.arc(x, y, rr, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const boxes = [];
+  for (let i = 0; i < N; i++) {
+    const rr = repR[i] * s;
+    if (rr < 11 && i !== 0) continue;
+    const x = fx[i] * s + tx, y = fy[i] * s + ty + rr + 4;
+    if (x < -100 || x > W + 100 || y < -30 || y > H) continue;
+    const name = folderDisplayName(i);
+    const fs = Math.round(Math.min(16, Math.max(10, rr * 0.34)));
+    const w = name.length * fs * 0.62 + 16, h = fs * 2.1;
+    const bx0 = x - w / 2, bx1 = x + w / 2, by0 = y, by1 = y + h;
+    let hit = false;
+    for (const b of boxes) if (bx0 < b[1] && bx1 > b[0] && by0 < b[3] && by1 > b[2]) { hit = true; break; }
+    if (hit) continue;
+    boxes.push([bx0, bx1, by0, by1]);
+    ctx.font = `600 ${fs}px "Segoe UI","Malgun Gothic",sans-serif`;
+    ctx.strokeStyle = 'rgba(10,10,20,0.9)';
+    ctx.lineWidth = 3.5;
+    ctx.strokeText(name, x, y);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(name, x, y);
+    if (rr > 18) {
+      const sub = `${total[i].toLocaleString()}장`;
+      ctx.font = `${Math.max(9, fs - 2)}px "Segoe UI","Malgun Gothic",sans-serif`;
+      ctx.strokeText(sub, x, y + fs + 2);
+      ctx.fillStyle = '#b4b4cc';
+      ctx.fillText(sub, x, y + fs + 2);
+    }
+  }
+
+  pump(wanted);
+  if (anim) requestRender();
+}
+
+/* ---------------------------------------------------------------- camera */
+
+let anim = null;
+
+function usableCenterY() {
+  const topPad = 8;
+  const botPad = getBarHeight();
+  return topPad + Math.max(100, H - topPad - botPad) / 2;
+}
+
+function usableMinDim() {
+  const topPad = 8;
+  const botPad = getBarHeight();
+  return Math.min(W, Math.max(200, H - topPad - botPad));
+}
+
+function setCamera(wcx, wcy, s) {
+  cam.s = s;
+  cam.tx = W / 2 - wcx * s;
+  cam.ty = usableCenterY() - wcy * s;
+}
+
+function flyTo(wx, wy, radius, animate = true) {
+  const s1 = Math.max(minScale, Math.min(400, usableMinDim() / (2 * radius * 1.08)));
+  if (!animate) { setCamera(wx, wy, s1); requestRender(); return; }
+  const cy = usableCenterY();
+  const s0 = cam.s, c0x = (W / 2 - cam.tx) / s0, c0y = (cy - cam.ty) / s0;
+  const t0 = performance.now(), dur = 750;
+  anim = (now) => {
+    let u = Math.min(1, (now - t0) / dur);
+    u = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+    const s = Math.exp(Math.log(s0) + (Math.log(s1) - Math.log(s0)) * u);
+    setCamera(c0x + (wx - c0x) * u, c0y + (wy - c0y) * u, s);
+    if (u >= 1) anim = null;
+  };
+  requestRender();
+}
+
+function stepAnim(now) { if (anim) { anim(now); requestRender(); } requestAnimationFrame(stepAnim); }
+requestAnimationFrame(stepAnim);
+
+function fitAll(animate = true) {
+  if (!T) return;
+  minScale = usableMinDim() / (2 * subR[0]) * 0.4;
+  flyTo(encX[0], encY[0], subR[0], animate);
+}
+
+function zoomAt(x, y, f) {
+  const s2 = Math.max(minScale, Math.min(400, cam.s * f));
+  f = s2 / cam.s;
+  cam.tx = x - (x - cam.tx) * f;
+  cam.ty = y - (y - cam.ty) * f;
+  cam.s = s2;
+  requestRender();
+}
+
+/* ------------------------------------------- hit-test & interaction */
+
+function hitTest(sx, sy) {
+  if (!T) return null;
+  const wx = (sx - cam.tx) / cam.s, wy = (sy - cam.ty) / cam.s;
+  let candF = -1, bestR = Infinity;
+  for (let i = 0; i < N; i++) {
+    if (Math.hypot(wx - fx[i], wy - fy[i]) <= repR[i] && repR[i] < bestR) {
+      candF = i; bestR = repR[i];
+    }
+  }
+  if (candF >= 0) return { type: 'folder', i: candF };
+
+  if (P * cam.s >= 2.5) {
+    for (let i = 0; i < N; i++) {
+      if (!count[i] || Math.hypot(wx - fx[i], wy - fy[i]) > coreR[i] + 2) continue;
+      const a = start[i], b = a + count[i];
+      for (let id = a; id < b; id++) {
+        if (Math.hypot(wx - px[id], wy - py[id]) <= P) return { type: 'photo', id, i };
+      }
+    }
+  }
+  for (let i = 0; i < N; i++) {
+    if (count[i] && Math.hypot(wx - fx[i], wy - fy[i]) <= coreR[i]) return { type: 'cluster', i };
+  }
+  return null;
+}
+
+const tip = $('#tip');
+const pointers = new Map();
+let drag = null;
+let pinch = null;
+let longPressTimer = null;
+let longPressTriggered = false;
+
+function cancelLongPress() {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0 && e.pointerType === 'mouse') return;
+  canvas.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  anim = null;
+  tip.hidden = true;
+  longPressTriggered = false;
+  cancelLongPress();
+
+  if (pointers.size === 1) {
+    drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false };
+    pinch = null;
+    const h = hitTest(e.clientX, e.clientY);
+    if (h) {
+      longPressTimer = setTimeout(() => {
+        longPressTimer = null;
+        if (pointers.size === 1 && drag && !drag.moved) {
+          longPressTriggered = true;
+          openContextMenu(h);
+        }
+      }, 480);
+    }
+  } else if (pointers.size === 2) {
+    cancelLongPress();
+    const pts = Array.from(pointers.values());
+    pinch = {
+      dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y),
+      cx: (pts[0].x + pts[1].x) / 2,
+      cy: (pts[0].y + pts[1].y) / 2
+    };
+    drag = null;
+  }
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  if (pointers.has(e.pointerId)) {
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  }
+  if (longPressTriggered) return;
+
+  if (pointers.size === 2 && pinch) {
+    cancelLongPress();
+    const pts = Array.from(pointers.values());
+    const newDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    const newCx = (pts[0].x + pts[1].x) / 2;
+    const newCy = (pts[0].y + pts[1].y) / 2;
+    cam.tx += newCx - pinch.cx;
+    cam.ty += newCy - pinch.cy;
+    if (pinch.dist > 10 && newDist > 10) zoomAt(newCx, newCy, newDist / pinch.dist);
+    pinch = { dist: newDist, cx: newCx, cy: newCy };
+    requestRender();
+    return;
+  }
+
+  if (drag && pointers.size === 1) {
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 10) {
+      drag.moved = true;
+      cancelLongPress();
+      canvas.classList.add('dragging');
+    }
+    cam.tx += dx; cam.ty += dy;
+    drag.x = e.clientX; drag.y = e.clientY;
+    requestRender();
+    return;
+  }
+
+  if (e.pointerType === 'mouse') {
+    const h = hitTest(e.clientX, e.clientY);
+    canvas.classList.toggle('pointer', !!h);
+    if (!h) { tip.hidden = true; return; }
+    tip.hidden = false;
+    tip.style.left = Math.min(W - 260, e.clientX + 14) + 'px';
+    tip.style.top = Math.min(H - 90, e.clientY + 14) + 'px';
+    if (h.type === 'photo') {
+      tip.innerHTML = `<b>${esc(T.photos[h.id])}</b><br><span>${esc(folderPath(h.i))} (우클릭: 대표사진 지정)</span>`;
+    } else {
+      tip.innerHTML = `<b>${esc(folderPath(h.i))}</b><br><span>폴더 사진 ${count[h.i].toLocaleString()}장 · 하위 포함 ${total[h.i].toLocaleString()}장 (우클릭: 설정)</span>`;
+    }
+  }
+});
+
+function onPointerEnd(e) {
+  cancelLongPress();
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinch = null;
+  if (pointers.size === 1) {
+    const pt = Array.from(pointers.values())[0];
+    drag = { x: pt.x, y: pt.y, sx: pt.x, sy: pt.y, moved: true };
+  } else if (pointers.size === 0) {
+    canvas.classList.remove('dragging');
+    if (drag && !drag.moved && !longPressTriggered) onClick(e.clientX, e.clientY);
+    drag = null;
+    longPressTriggered = false;
+  }
+}
+
+canvas.addEventListener('pointerup', onPointerEnd);
+canvas.addEventListener('pointercancel', onPointerEnd);
+
+canvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  cancelLongPress();
+  const h = hitTest(e.clientX, e.clientY);
+  if (h) openContextMenu(h);
+});
+
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  anim = null;
+  zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0016));
+}, { passive: false });
+
+function onClick(sx, sy) {
+  const h = hitTest(sx, sy);
+  if (!h) return;
+  if (h.type === 'photo') { openViewer(h.id); return; }
+  const i = h.i;
+  const r = count[i] > 0 ? coreR[i] : subR[i];
+  const target = usableMinDim() / (2 * r * 1.08);
+  const centerDist = Math.hypot(fx[i] * cam.s + cam.tx - W / 2, fy[i] * cam.s + cam.ty - usableCenterY());
+  if (centerDist < 40 && Math.abs(Math.log(cam.s / target)) < 0.35 && children[i].length && count[i] > 0) {
+    flyTo(encX[i], encY[i], subR[i]);
+  } else {
+    flyTo(count[i] > 0 ? fx[i] : encX[i], count[i] > 0 ? fy[i] : encY[i], r);
+  }
+}
+
+function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+/* ------------------------- Long-press / Right-click & Rep Photo Picker */
+
+const ctxOverlay = $('#ctxOverlay');
+const repOverlay = $('#repOverlay');
+let ctxTarget = null;
+
+function setFolderRepPhoto(folderIdx, photoId) {
+  if (folderIdx < 0 || folderIdx >= N || photoId < 0 || photoId >= NP) return;
+  customReps[folderKey(folderIdx)] = T.photos[photoId];
+  rep[folderIdx] = photoId;
+  saveCustomizations();
+  requestRender();
+  showToast(`'${folderDisplayName(folderIdx)}' 대표 사진이 변경되었습니다`);
+}
+
+function openContextMenu(h) {
+  ctxTarget = h;
+  $('#ctxRenameBox').hidden = true;
+  const actions = $('#ctxActions');
+  actions.innerHTML = '';
+
+  if (h.type === 'photo') {
+    const fIdx = h.i;
+    const pId = h.id;
+    $('#ctxTitle').textContent = T.photos[pId];
+    $('#ctxSub').textContent = `소속: ${folderPath(fIdx)}`;
+
+    addCtxBtn('⭐ 이 사진을 폴더 대표 사진으로 지정', () => {
+      closeContextMenu();
+      setFolderRepPhoto(fIdx, pId);
+    });
+    if (parent[fIdx] >= 0) {
+      const pFolder = parent[fIdx];
+      addCtxBtn(`🌟 상위('${folderDisplayName(pFolder)}') 대표 사진으로도 지정`, () => {
+        closeContextMenu();
+        setFolderRepPhoto(pFolder, pId);
+      });
+    }
+    addCtxBtn('🔍 사진 크게 보기', () => {
+      closeContextMenu();
+      openViewer(pId);
+    });
+  } else {
+    const i = h.i;
+    $('#ctxTitle').textContent = folderDisplayName(i);
+    $('#ctxSub').textContent = `${folderPath(i)} · 사진 ${total[i].toLocaleString()}장`;
+
+    addCtxBtn('🖼️ 대표 사진 변경 (목록에서 고르기)', () => {
+      closeContextMenu();
+      openRepPicker(i);
+    });
+    addCtxBtn('✏️ 표시 이름 변경', () => {
+      const box = $('#ctxRenameBox');
+      box.hidden = !box.hidden;
+      if (!box.hidden) {
+        const inp = $('#ctxRenameInput');
+        inp.value = folderDisplayName(i);
+        setTimeout(() => inp.focus(), 50);
+      }
+    });
+    addCtxBtn('🔍 이 폴더로 확대 이동', () => {
+      closeContextMenu();
+      const r = count[i] > 0 ? coreR[i] : subR[i];
+      flyTo(count[i] > 0 ? fx[i] : encX[i], count[i] > 0 ? fy[i] : encY[i], r);
+    });
+    if (rep[i] >= 0) {
+      addCtxBtn('📷 현재 대표 사진 크게 보기', () => {
+        closeContextMenu();
+        openViewer(rep[i]);
+      });
+    }
+    if (customReps[folderKey(i)] || customNames[folderKey(i)]) {
+      addCtxBtn('🔄 기본 대표사진·이름으로 초기화', () => {
+        delete customReps[folderKey(i)];
+        delete customNames[folderKey(i)];
+        saveCustomizations();
+        applyCustomReps();
+        closeContextMenu();
+        requestRender();
+        showToast('기본 설정으로 초기화되었습니다');
+      });
+    }
+  }
+  ctxOverlay.hidden = false;
+}
+
+function addCtxBtn(label, onClick) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = label;
+  b.onclick = onClick;
+  $('#ctxActions').appendChild(b);
+}
+
+function closeContextMenu() {
+  ctxOverlay.hidden = true;
+  ctxTarget = null;
+}
+
+$('#ctxCancel').onclick = closeContextMenu;
+ctxOverlay.addEventListener('click', (e) => { if (e.target === ctxOverlay) closeContextMenu(); });
+
+$('#ctxRenameSave').onclick = () => {
+  if (!ctxTarget || ctxTarget.type === 'photo') return;
+  const i = ctxTarget.i;
+  const val = $('#ctxRenameInput').value.trim();
+  if (val) {
+    customNames[folderKey(i)] = val;
+    saveCustomizations();
+    requestRender();
+    showToast(`표시 이름이 '${val}'(으)로 변경되었습니다`);
+  }
+  closeContextMenu();
+};
+$('#ctxRenameInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $('#ctxRenameSave').click();
+});
+
+function openRepPicker(folderIdx) {
+  const pStart = start[folderIdx];
+  const lastFolder = subEnd[folderIdx];
+  const pEnd = start[lastFolder] + count[lastFolder];
+  const totalInSub = pEnd - pStart;
+  $('#repTitle').textContent = `'${folderDisplayName(folderIdx)}' 대표 사진 선택`;
+  $('#repSub').textContent = `사진을 탭하면 대표 원 이미지로 지정됩니다 (총 ${totalInSub.toLocaleString()}장)`;
+
+  const grid = $('#repGrid');
+  grid.innerHTML = '';
+  const maxShow = 120;
+  const step = Math.max(1, Math.floor(totalInSub / maxShow));
+
+  for (let id = pStart, shown = 0; id < pEnd && shown < maxShow; id += step, shown++) {
+    const item = document.createElement('div');
+    item.className = 'rep-item' + (id === rep[folderIdx] ? ' current' : '');
+    fetchImg(id, 0).then((canvasThumb) => {
+      canvasThumb.style.width = '100%';
+      canvasThumb.style.height = '100%';
+      item.appendChild(canvasThumb);
+    }).catch(() => {});
+    item.onclick = () => {
+      repOverlay.hidden = true;
+      setFolderRepPhoto(folderIdx, id);
+    };
+    grid.appendChild(item);
+  }
+  repOverlay.hidden = false;
+}
+
+$('#repClose').onclick = () => { repOverlay.hidden = true; };
+repOverlay.addEventListener('click', (e) => { if (e.target === repOverlay) repOverlay.hidden = true; });
+
+/* ---------------------------------------------------------------- viewer */
+
+const viewer = $('#viewer'), vimg = $('#vimg');
+let vid = -1;
+let activeViewerUrl = null;
+
+function revokeViewerUrl() {
+  if (activeViewerUrl) {
+    URL.revokeObjectURL(activeViewerUrl);
+    activeViewerUrl = null;
+  }
+}
+
+function openViewer(id) {
+  if (id < 0 || id >= NP) return;
+  vid = id;
+  viewer.hidden = false;
+  tip.hidden = true;
+  revokeViewerUrl();
+
+  const entry = orderedEntries[id];
+  if (entry && entry.file) {
+    activeViewerUrl = URL.createObjectURL(entry.file);
+    vimg.src = activeViewerUrl;
+  } else if (entry && entry.demoSeed != null) {
+    vimg.src = renderDemoThumb(entry.demoSeed, 800).toDataURL();
+  }
+  const i = pf[id];
+  $('#vinfo').innerHTML = `<b>${esc(T.photos[id])}</b> &nbsp; ${esc(folderPath(i))} &nbsp; (${id - start[i] + 1} / ${count[i]})`;
+}
+
+function closeViewer() {
+  viewer.hidden = true;
+  revokeViewerUrl();
+  if (vid >= 0) {
+    const sx = px[vid] * cam.s + cam.tx, sy = py[vid] * cam.s + cam.ty;
+    if (sx < 0 || sx > W || sy < 0 || sy > H) flyTo(px[vid], py[vid], usableMinDim() / (2 * cam.s * 1.08));
+  }
+  vid = -1;
+}
+
+$('#vprev').onclick = (e) => { e.stopPropagation(); openViewer(vid - 1); };
+$('#vnext').onclick = (e) => { e.stopPropagation(); openViewer(vid + 1); };
+$('#vclose').onclick = (e) => { e.stopPropagation(); closeViewer(); };
+$('#vcloseTop').onclick = (e) => { e.stopPropagation(); closeViewer(); };
+$('#vorig').onclick = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (vid >= 0 && orderedEntries[vid]) {
+    const entry = orderedEntries[vid];
+    if (entry.file) {
+      const u = URL.createObjectURL(entry.file);
+      window.open(u, '_blank');
+    } else {
+      showToast('샘플 데모 이미지입니다');
+    }
+  }
+};
+$('#vsetRep').onclick = (e) => {
+  e.stopPropagation();
+  if (vid >= 0) setFolderRepPhoto(pf[vid], vid);
+};
+viewer.addEventListener('click', (e) => { if (e.target === viewer) closeViewer(); });
+viewer.addEventListener('wheel', (e) => { e.preventDefault(); openViewer(vid + (e.deltaY > 0 ? 1 : -1)); }, { passive: false });
+
+window.addEventListener('keydown', (e) => {
+  if (!repOverlay.hidden) { if (e.key === 'Escape') repOverlay.hidden = true; return; }
+  if (!ctxOverlay.hidden) { if (e.key === 'Escape') closeContextMenu(); return; }
+  if (!viewer.hidden) {
+    if (e.key === 'ArrowRight' || e.key === ' ') openViewer(vid + 1);
+    else if (e.key === 'ArrowLeft') openViewer(vid - 1);
+    else if (e.key === 'Escape') closeViewer();
+    else return;
+    e.preventDefault();
+    return;
+  }
+  if (document.activeElement === $('#search') || document.activeElement === $('#ctxRenameInput') || document.activeElement === $('#tpInput')) return;
+  if (e.key === 'Home' || e.key === '0') fitAll();
+  else if (e.key === '+' || e.key === '=') zoomAt(W / 2, usableCenterY(), 1.5);
+  else if (e.key === '-') zoomAt(W / 2, usableCenterY(), 1 / 1.5);
+});
+
+/* ---------------------------------------------------------------- search */
+
+const search = $('#search'), results = $('#results');
+let hits = [], sel = 0;
+
+function renderResults() {
+  results.innerHTML = hits.map((i, k) =>
+    `<li data-i="${i}" class="${k === sel ? 'sel' : ''}">${esc(folderDisplayName(i))} <span style="color:#8a8aa5">· ${total[i].toLocaleString()}장</span>` +
+    `<span class="p">${esc(folderPath(i))}</span></li>`).join('');
+  results.hidden = !hits.length;
+}
+
+search.addEventListener('input', () => {
+  const q = search.value.trim().toLowerCase();
+  hits = [];
+  sel = 0;
+  if (q && T) {
+    for (let i = 0; i < N && hits.length < 40; i++) {
+      if (folderDisplayName(i).toLowerCase().includes(q) || T.folders[i][1].toLowerCase().includes(q)) hits.push(i);
+    }
+  }
+  renderResults();
+});
+
+search.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown') { sel = Math.min(hits.length - 1, sel + 1); renderResults(); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { sel = Math.max(0, sel - 1); renderResults(); e.preventDefault(); }
+  else if (e.key === 'Enter' && hits.length) goFolder(hits[sel]);
+  else if (e.key === 'Escape') { search.value = ''; hits = []; renderResults(); search.blur(); }
+});
+
+results.addEventListener('click', (e) => {
+  const li = e.target.closest('li');
+  if (li) goFolder(+li.dataset.i);
+});
+
+function goFolder(i) {
+  results.hidden = true;
+  search.blur();
+  flyTo(count[i] > 0 ? fx[i] : encX[i], count[i] > 0 ? fy[i] : encY[i], count[i] > 0 ? coreR[i] : subR[i]);
+}
+
+/* ------------------------------------------------------ controls & inputs */
+
+function updateModeButtons(mode) {
+  document.querySelectorAll('.mode-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+}
+
+$('#modeGroup').addEventListener('click', (e) => {
+  const btn = e.target.closest('.mode-btn');
+  if (!btn || btn.classList.contains('active')) return;
+  if (!rawEntries.length) { showToast('먼저 폴더나 사진을 선택해 주세요'); return; }
+  buildTreeFromRawEntries(btn.dataset.mode);
+});
+
+function setThumbMax(val) {
+  const n = parseInt(val, 10);
+  if (isNaN(n)) return;
+  thumbMaxVisible = Math.max(1, Math.min(5000, n));
+  try { localStorage.setItem('thumbMaxVisible', String(thumbMaxVisible)); } catch (_) {}
+  $('#thumbVal').textContent = thumbMaxVisible;
+  $('#tpCur').textContent = thumbMaxVisible;
+  $('#tpRange').value = Math.max(50, Math.min(1000, thumbMaxVisible));
+  const inp = $('#tpInput');
+  if (inp && document.activeElement !== inp) inp.value = thumbMaxVisible;
+  document.querySelectorAll('.tp-presets button').forEach((b) => {
+    b.classList.toggle('active', +b.dataset.v === thumbMaxVisible);
+  });
+  requestRender();
+}
+setThumbMax(thumbMaxVisible);
+
+$('#btnThumbCfg').onclick = (e) => {
+  e.stopPropagation();
+  $('#thumbPop').hidden = !$('#thumbPop').hidden;
+  if (!$('#thumbPop').hidden) $('#tpInput').value = thumbMaxVisible;
+};
+$('#thumbPop').onclick = (e) => e.stopPropagation();
+$('#tpRange').oninput = (e) => setThumbMax(+e.target.value);
+$('#tpInput').oninput = (e) => {
+  const v = parseInt(e.target.value, 10);
+  if (!isNaN(v) && v >= 1) setThumbMax(v);
+};
+$('#tpInput').onchange = (e) => {
+  setThumbMax(+e.target.value || 100);
+  $('#tpInput').value = thumbMaxVisible;
+};
+$('#tpMinus').onclick = () => {
+  const next = Math.max(10, Math.floor((thumbMaxVisible - 1) / 100) * 100 || 10);
+  setThumbMax(next);
+  $('#tpInput').value = thumbMaxVisible;
+};
+$('#tpPlus').onclick = () => {
+  const next = Math.min(5000, (Math.floor(thumbMaxVisible / 100) + 1) * 100);
+  setThumbMax(next);
+  $('#tpInput').value = thumbMaxVisible;
+};
+document.querySelectorAll('.tp-presets button').forEach((b) => {
+  b.onclick = () => {
+    setThumbMax(+b.dataset.v);
+    $('#tpInput').value = thumbMaxVisible;
+    $('#thumbPop').hidden = true;
+  };
+});
+window.addEventListener('pointerdown', (e) => {
+  if (!$('#thumbPop').hidden && !e.target.closest('.thumb-wrap')) $('#thumbPop').hidden = true;
+});
+
+$('#btnFit').onclick = () => fitAll();
+$('#btnFolder').onclick = () => { $('#dirInput').value = ''; $('#dirInput').click(); };
+$('#btnPickPhotos').onclick = () => { $('#filesInput').value = ''; $('#filesInput').click(); };
+$('#btnStartDir').onclick = () => { $('#dirInput').value = ''; $('#dirInput').click(); };
+$('#btnStartFiles').onclick = () => { $('#filesInput').value = ''; $('#filesInput').click(); };
+$('#btnStartDemo').onclick = () => loadDemoGalaxy();
+
+$('#dirInput').onchange = (e) => {
+  if (e.target.files && e.target.files.length) ingestFileList(e.target.files, '내 폴더');
+};
+$('#filesInput').onchange = (e) => {
+  if (e.target.files && e.target.files.length) ingestFileList(e.target.files, '선택한 사진');
+};
+
+// Drag & Drop support for folders and files
+window.addEventListener('dragover', (e) => { e.preventDefault(); document.body.classList.add('drag-over'); });
+window.addEventListener('dragleave', (e) => { if (e.relatedTarget === null) document.body.classList.remove('drag-over'); });
+window.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  document.body.classList.remove('drag-over');
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+    ingestFileList(e.dataTransfer.files, '드롭한 사진');
+  }
+});
+
+window.addEventListener('resize', resize);
+resize();
+</script>
+</body>
+</html>
