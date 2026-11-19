@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyBrowser — a browser that fixes the small things</title>
+<script>document.documentElement.classList.add("js");</script>
+<meta name="description" content="MyBrowser is a 152 KB Android browser built around the way people watch, read and listen: your own video aspect ratio, playback speed under your thumb, pages that read themselves, a translation mode, and no ads or app-jumps. No account, no analytics, no ads of its own.">
+<meta name="theme-color" content="#050917">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MyBrowser — a browser that fixes the small things">
+<meta property="og:description" content="A 152 KB Android browser with real video controls, read-aloud, translation, auto-scroll and quiet ad blocking. No account, no analytics, no ads of its own.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23070D24'/%3E%3Cellipse cx='32' cy='32' rx='25' ry='8' fill='none' stroke='%23FB923C' stroke-width='3' transform='rotate(-18 32 32)'/%3E%3Ccircle cx='32' cy='32' r='15' fill='%233D6BFF'/%3E%3Cpath d='M30 26 L39 32 L30 38 Z' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#050917;
+    --ink:#E9EEFF;
+    --muted:#9AA6C9;
+    --dim:#6E7AA0;
+    --line:rgba(148,163,214,.16);
+    --line-soft:rgba(148,163,214,.10);
+    --cyan:#67E8F9;
+    --blue:#3D6BFF;
+    --orange:#FB923C;
+    --grad:linear-gradient(115deg,#67E8F9 0%,#3D6BFF 78%);
+    --card:linear-gradient(180deg,rgba(255,255,255,.048),rgba(255,255,255,.014));
+    --shadow:0 30px 60px -32px rgba(2,6,24,.95);
+    --max:1160px;
+    --r:20px;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    font-size:16px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  html[data-lang="en"] .ko{display:none}
+  html[data-lang="ko"] .en{display:none}
+  .ko{word-break:keep-all}
+  html[data-lang="ko"] .eyebrow{letter-spacing:.07em}
+  html[data-lang="ko"] h1{line-height:1.18;letter-spacing:-.03em}
+  html[data-lang="ko"] .origin h2{line-height:1.35}
+
+  a{color:inherit}
+  h1,h2,h3,h4{line-height:1.15;letter-spacing:-.022em;margin:0;font-weight:750}
+  p{margin:0}
+  ul{margin:0;padding:0;list-style:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+  .skip{position:absolute;left:-9999px;top:0}
+  .skip:focus{left:12px;top:12px;z-index:100;background:#0B1226;padding:10px 16px;border-radius:10px;border:1px solid var(--line)}
+
+  /* ---------- night sky ---------- */
+  .sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(1100px 720px at 76% -14%,rgba(30,58,138,.62),transparent 66%),
+      radial-gradient(820px 620px at 4% 8%,rgba(61,107,255,.16),transparent 70%),
+      radial-gradient(720px 520px at 52% 108%,rgba(251,146,60,.075),transparent 72%);
+  }
+  .sky::before,.sky::after{content:"";position:absolute;inset:0;background-repeat:no-repeat;background-size:100% 100%}
+  .sky::before{
+    background-image:
+      radial-gradient(1.6px 1.6px at 7% 13%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 18% 31%,#D8E6FF,transparent),
+      radial-gradient(1.8px 1.8px at 26% 7%,#fff,transparent),
+      radial-gradient(1.1px 1.1px at 38% 21%,#C7D8FF,transparent),
+      radial-gradient(1.5px 1.5px at 47% 6%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 57% 27%,#fff,transparent),
+      radial-gradient(1.7px 1.7px at 66% 11%,#E4EEFF,transparent),
+      radial-gradient(1.1px 1.1px at 74% 34%,#fff,transparent),
+      radial-gradient(1.4px 1.4px at 84% 9%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 92% 24%,#D8E6FF,transparent),
+      radial-gradient(1.1px 1.1px at 12% 47%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 31% 55%,#C7D8FF,transparent),
+      radial-gradient(1px 1px at 52% 44%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 71% 59%,#fff,transparent),
+      radial-gradient(1px 1px at 89% 49%,#D8E6FF,transparent),
+      radial-gradient(1.1px 1.1px at 21% 74%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 44% 83%,#C7D8FF,transparent),
+      radial-gradient(1px 1px at 63% 79%,#fff,transparent),
+      radial-gradient(1.1px 1.1px at 81% 88%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 94% 71%,#D8E6FF,transparent);
+    opacity:.62;
+  }
+  .sky::after{
+    background-image:
+      radial-gradient(2.4px 2.4px at 63% 16%,rgba(103,232,249,.9),transparent),
+      radial-gradient(2.2px 2.2px at 22% 62%,rgba(251,146,60,.75),transparent),
+      radial-gradient(2.2px 2.2px at 88% 41%,rgba(103,232,249,.6),transparent);
+    opacity:.5;
+  }
+
+  main,header,footer{position:relative;z-index:1}
+
+  /* ---------- nav ---------- */
+  .nav{position:sticky;top:0;z-index:60;background:rgba(5,9,23,.62);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid transparent;transition:border-color .25s ease,background .25s ease}
+  .nav.scrolled{border-bottom-color:var(--line-soft);background:rgba(5,9,23,.9)}
+  .nav-in{max-width:var(--max);margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:20px}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:750;letter-spacing:-.02em;font-size:1.04rem}
+  .brand .mark{width:34px;height:34px;border-radius:11px;flex:0 0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.09),0 8px 22px -10px rgba(61,107,255,.9)}
+  .brand small{display:block;font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);font-weight:650;margin-top:1px}
+  .nav-links{display:flex;gap:24px;margin-left:auto;font-size:.93rem}
+  .nav-links a{color:var(--muted);text-decoration:none;transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  .lang{display:flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px;background:rgba(255,255,255,.03)}
+  .lang button{border:0;background:none;color:var(--muted);font:inherit;font-size:.8rem;font-weight:650;padding:5px 11px;border-radius:999px;cursor:pointer;letter-spacing:.02em}
+  .lang button[aria-pressed="true"]{background:rgba(103,232,249,.14);color:#C8F4FF}
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 22px;border-radius:14px;font-weight:700;font-size:.97rem;text-decoration:none;border:1px solid transparent;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;white-space:nowrap}
+  .btn svg{width:18px;height:18px}
+  .btn-primary{background:var(--grad);color:#031024;box-shadow:0 16px 34px -14px rgba(61,107,255,.85)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 22px 40px -14px rgba(61,107,255,.95)}
+  .btn-ghost{border-color:var(--line);color:var(--ink);background:rgba(255,255,255,.035)}
+  .btn-ghost:hover{background:rgba(255,255,255,.07);transform:translateY(-2px)}
+  .btn-small{padding:9px 15px;font-size:.86rem;border-radius:11px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:clamp(44px,6vw,78px) 0 26px}
+  .hero-grid{display:grid;grid-template-columns:1.03fr .97fr;gap:clamp(28px,4vw,58px);align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.72rem;letter-spacing:.17em;text-transform:uppercase;color:#8FD8FF;font-weight:750}
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px rgba(103,232,249,.9)}
+  h1{font-size:clamp(2.3rem,4.7vw,3.7rem);margin:16px 0 18px;letter-spacing:-.032em;line-height:1.04}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{font-size:clamp(1rem,1.2vw,1.1rem);color:var(--muted);max-width:57ch}
+  .sub b{color:#D5DEF6;font-weight:650}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .chip{font-size:.79rem;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:#B6C2E4;background:rgba(255,255,255,.028);white-space:nowrap}
+
+  /* ---------- phone illustration ---------- */
+  .phone-col{display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .phone-wrap{position:relative;display:flex;justify-content:center;align-items:center;min-height:470px;width:100%}
+  .phone-wrap::before{content:"";position:absolute;width:82%;height:78%;border-radius:50%;background:radial-gradient(circle,rgba(61,107,255,.34),transparent 66%);filter:blur(26px)}
+  .phone{position:relative;width:min(286px,84%);aspect-ratio:9/18.6;padding:8px;border-radius:38px;
+    background:linear-gradient(155deg,#2A3559,#0A1024 62%);
+    box-shadow:0 44px 90px -34px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.1),0 0 64px -12px rgba(61,107,255,.5);
+    transform:rotate(-2.2deg)}
+  .screen{position:relative;height:100%;border-radius:31px;overflow:hidden;background:#F6F7FB;color:#1B2130;display:flex;flex-direction:column;font-family:inherit}
+  .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:52px;height:5px;border-radius:99px;background:rgba(10,16,36,.22);z-index:3}
+  .bar{flex:0 0 auto;display:flex;align-items:center;gap:3px;padding:15px 8px 8px;background:#fff}
+  .url{flex:1;min-width:0;display:flex;align-items:center;gap:4px;font-size:8.4px;background:#EEF1FA;border-radius:99px;padding:6px 9px;color:#7C86A0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .url b{color:#3D6BFF;font-weight:700}
+  .tbtn{flex:0 0 auto;width:15px;height:15px;display:grid;place-items:center;color:#68769A;font-size:9.5px;line-height:1}
+  .tbtn svg{width:11px;height:11px;fill:currentColor}
+  .video{position:relative;flex:0 0 auto;aspect-ratio:16/10;background:linear-gradient(150deg,#0A1836,#1E3A8A 48%,#3D6BFF);display:grid;place-items:center;overflow:hidden}
+  .video::before{content:"";position:absolute;inset:0;background:
+    radial-gradient(60% 70% at 22% 18%,rgba(103,232,249,.35),transparent 70%),
+    radial-gradient(50% 60% at 82% 84%,rgba(251,146,60,.32),transparent 70%)}
+  .vpill{position:relative;display:flex;gap:4px;padding:3px;border-radius:99px;background:rgba(6,11,26,.55);backdrop-filter:blur(4px)}
+  .vpill span{font-size:7.4px;color:#E8EEFF;padding:2.5px 6px;border-radius:99px;font-weight:650;letter-spacing:.01em}
+  .vpill span.hot{background:rgba(103,232,249,.9);color:#04121F}
+  .vtag{position:absolute;left:7px;bottom:7px;font-size:6.8px;letter-spacing:.06em;text-transform:uppercase;color:#DCE6FF;background:rgba(6,11,26,.55);padding:3px 6px;border-radius:6px}
+  .article{flex:1;min-height:0;padding:11px 12px 6px;background:#FBFBFE;overflow:hidden}
+  .article h4{font-size:10.5px;line-height:1.35;color:#1B2130;margin-bottom:7px;letter-spacing:-.01em}
+  .article p{font-size:8.6px;line-height:2.05;color:#4A5573}
+  .s-g{background:rgba(110,220,70,.30);border-radius:3px;padding:0 2px}
+  .s-o{background:rgba(255,160,50,.32);border-radius:3px;padding:0 2px}
+  .s-p{background:rgba(255,90,130,.28);border-radius:3px;padding:0 2px}
+  .ln{height:5px;border-radius:3px;background:#E7EAF4;margin-bottom:5px}
+  .ln.w1{width:92%}.ln.w2{width:78%}.ln.w3{width:86%}.ln.w4{width:56%}
+  .bottom{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:2px;padding:9px 9px 10px;background:#fff;border-top:1px solid #ECEEF6;color:#5B6784}
+  .bottom span{display:grid;place-items:center;font-size:9px;line-height:1;min-width:12px}
+  .bottom svg{width:11px;height:11px;fill:currentColor}
+  .shieldb{position:relative}
+  .shieldb i{position:absolute;top:-4px;right:-5px;background:#3D6BFF;color:#fff;font-style:normal;font-size:5.6px;font-weight:700;padding:1px 3px;border-radius:99px;line-height:1.25}
+
+  .float{position:absolute;z-index:3;display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:12px;
+    background:rgba(10,17,40,.92);border:1px solid var(--line);font-size:.76rem;color:#C9D5F6;
+    box-shadow:0 18px 40px -20px rgba(0,0,0,.95);backdrop-filter:blur(8px)}
+  .float svg{width:13px;height:13px;fill:var(--cyan)}
+  .float.a{top:6%;left:0}
+  .float.b{top:44%;right:-2%}
+  .float.c{bottom:9%;left:2%}
+  .float.o svg{fill:var(--orange)}
+  .mock-note{margin-top:14px;font-size:.72rem;color:var(--dim);text-align:center}
+
+  /* ---------- stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:16px;overflow:hidden;margin-top:38px}
+  .stat{background:#070E22;padding:18px 12px;text-align:center}
+  .stat b{display:block;font-size:1.42rem;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:750}
+  .stat span{font-size:.76rem;color:var(--dim);display:block;margin-top:2px}
+
+  /* ---------- origin band ---------- */
+  .origin{padding:30px 0 4px}
+  .origin-in{display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(18px,4vw,44px);
+    border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);padding:26px 0}
+  .origin h2{font-size:1.24rem;margin:0;letter-spacing:-.02em;display:flex;align-items:center;align-self:start;gap:10px}
+  .origin h2::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px rgba(251,146,60,.8);flex:0 0 auto}
+  .origin p{color:var(--muted);font-size:.96rem;line-height:1.72}
+  .origin p b{color:#CBD6F2;font-weight:650}
+
+  /* ---------- sections ---------- */
+  section[id]{scroll-margin-top:74px}
+  .sec{padding:clamp(56px,7vw,92px) 0}
+  .sec-head{max-width:70ch;margin-bottom:34px}
+  h2{font-size:clamp(1.75rem,3.2vw,2.55rem);margin:14px 0 14px;letter-spacing:-.028em}
+  .lead{color:var(--muted);font-size:1.03rem;max-width:64ch}
+  .lead b{color:#CBD6F2;font-weight:600}
+
+  .cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(272px,1fr))}
+  .cards .span2{grid-column:span 2}
+  .minis .span2{grid-column:span 2}
+  .card{position:relative;padding:25px 23px 24px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,transform .25s ease}
+  .card:hover{border-color:rgba(103,232,249,.3);transform:translateY(-2px)}
+  .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(420px 130px at 12% -20%,rgba(103,232,249,.13),transparent 70%)}
+  .card>*{position:relative;z-index:1}
+  .ico{position:relative;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;margin-bottom:15px;
+    background:linear-gradient(160deg,rgba(103,232,249,.16),rgba(61,107,255,.1));border:1px solid rgba(103,232,249,.2);color:#A8E9FF}
+  .ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .ico.txt{font-size:1.05rem;font-weight:800;color:#A8E9FF;font-family:"Noto Sans KR","Apple SD Gothic Neo",sans-serif}
+  .card h3{font-size:1.05rem;margin-bottom:7px;letter-spacing:-.015em}
+  .card p{color:var(--muted);font-size:.93rem;line-height:1.72}
+  .card.span2 p{max-width:72ch}
+  .card p em{font-style:normal;color:#CBD6F2}
+
+  /* ---------- compact details ---------- */
+  .minis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .mini{display:flex;gap:14px;padding:18px 18px 17px;border-radius:16px;border:1px solid var(--line-soft);background:rgba(255,255,255,.022)}
+  .mini .ico{width:34px;height:34px;border-radius:10px;margin:0;flex:0 0 auto}
+  .mini .ico svg{width:17px;height:17px}
+  .mini h3{font-size:.96rem;margin-bottom:4px}
+  .mini p{color:var(--muted);font-size:.87rem;line-height:1.62}
+  .mini.span2 p{max-width:82ch}
+
+  /* ---------- download ---------- */
+  .dl{position:relative;border-radius:28px;overflow:hidden;border:1px solid rgba(103,232,249,.22);
+    background:
+      radial-gradient(760px 320px at 88% -18%,rgba(61,107,255,.42),transparent 68%),
+      radial-gradient(560px 300px at 6% 108%,rgba(251,146,60,.14),transparent 70%),
+      linear-gradient(180deg,rgba(19,31,72,.92),rgba(8,14,34,.94));
+    box-shadow:0 40px 80px -40px rgba(0,0,0,.95);
+    display:grid;grid-template-columns:1.06fr .94fr;gap:clamp(24px,4vw,46px);padding:clamp(26px,4vw,46px)}
+  .dl h2{margin-top:12px}
+  .dl-meta{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 24px}
+  .dl-meta span{font-size:.79rem;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#C4D0F0}
+  .steps{counter-reset:s;list-style:none;padding:0;display:grid;gap:12px;margin:0 0 26px}
+  .steps li{counter-increment:s;position:relative;padding-left:38px;color:var(--muted);font-size:.94rem;line-height:1.6}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;
+    display:grid;place-items:center;font-size:.76rem;font-weight:750;color:#B7ECFF;
+    background:rgba(103,232,249,.12);border:1px solid rgba(103,232,249,.28)}
+  .steps li b{color:var(--ink);font-weight:650}
+  .dl-actions{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  .dl-fine{font-size:.76rem;color:var(--dim);line-height:1.6;margin-top:2px;max-width:38ch}
+  .aside{display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .note{border-radius:16px;border:1px solid var(--line);background:rgba(6,12,30,.55);padding:18px 18px 16px}
+  .note h3{font-size:.9rem;display:flex;align-items:center;gap:8px;margin-bottom:7px;color:#DCE6FF}
+  .note h3 svg{width:15px;height:15px;fill:none;stroke:var(--orange);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .note p{font-size:.84rem;color:var(--muted);line-height:1.62}
+  .note.privacy h3 svg{stroke:var(--cyan)}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line-soft);padding:34px 0 44px;margin-top:20px}
+  .foot{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+  .foot .brand{font-size:.95rem}
+  .foot .brand .mark{width:26px;height:26px;border-radius:8px}
+  .foot-links{display:flex;flex-wrap:wrap;gap:18px;font-size:.85rem;color:var(--dim)}
+  .foot-links a{text-decoration:none;color:var(--dim)}
+  .foot-links a:hover{color:var(--ink)}
+  .foot-note{width:100%;font-size:.76rem;color:#5C6685;margin-top:6px}
+
+  html.js .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  html.js .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:980px){
+    .hero-grid{grid-template-columns:1fr;gap:38px}
+    .origin-in{grid-template-columns:1fr;gap:12px}
+    .phone-col{order:-1}
+    .phone-wrap{min-height:auto;margin-bottom:6px}
+    .phone{width:min(250px,66%)}
+    .float{display:none}
+    .stats{grid-template-columns:repeat(3,1fr)}
+    .dl{grid-template-columns:1fr}
+  }
+  @media (max-width:720px){
+    .nav-links{display:none}
+    .lang{margin-left:auto}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stat:last-child{grid-column:span 2}
+    .phone-wrap{min-height:auto}
+    .phone{width:min(232px,74%)}
+    .sec{padding:52px 0}
+  }
+  @media (max-width:760px){
+    .cards .span2,.minis .span2{grid-column:auto}
+  }
+  @media (max-width:460px){
+    .wrap{padding:0 18px}
+    .cta .btn{width:100%}
+    .dl{padding:24px 20px;border-radius:22px}
+    .phone{width:min(214px,80%)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="ko">본문으로 건너뛰기</span></a>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top">
+      <svg class="mark" viewBox="0 0 96 96" aria-hidden="true">
+        <defs>
+          <radialGradient id="skyG" cx="34%" cy="26%" r="86%">
+            <stop offset="0" stop-color="#1E3A8A"/><stop offset="1" stop-color="#070D24"/>
+          </radialGradient>
+          <linearGradient id="globeG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#67E8F9"/><stop offset="1" stop-color="#2563EB"/>
+          </linearGradient>
+        </defs>
+        <rect width="96" height="96" rx="24" fill="url(#skyG)"/>
+        <circle cx="19" cy="22" r="1.4" fill="#fff" opacity=".85"/>
+        <circle cx="76" cy="17" r="1.1" fill="#fff" opacity=".7"/>
+        <circle cx="82" cy="76" r="1.1" fill="#fff" opacity=".55"/>
+        <circle cx="15" cy="62" r="1" fill="#fff" opacity=".5"/>
+        <g transform="rotate(-18 48 48)">
+          <path d="M14 48 A34 10 0 0 1 82 48" fill="none" stroke="#FB923C" stroke-width="2.6" stroke-opacity=".55"/>
+        </g>
+        <circle cx="48" cy="48" r="21" fill="url(#globeG)"/>
+        <ellipse cx="48" cy="48" rx="8.6" ry="21" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="1.3"/>
+        <ellipse cx="48" cy="48" rx="21" ry="6.8" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="1.3"/>
+        <path d="M45 39.5 L56.5 48 L45 56.5 Z" fill="#fff" stroke="#fff" stroke-width="3.2" stroke-linejoin="round"/>
+        <g transform="rotate(-18 48 48)">
+          <path d="M82 48 A34 10 0 0 1 14 48" fill="none" stroke="#FB923C" stroke-width="2.6"/>
+          <circle cx="81" cy="48" r="2.7" fill="#FDBA74"/>
+        </g>
+      </svg>
+      <span>MyBrowser<small>v1.0.65 · Android</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#video"><span class="en">Video</span><span class="ko">영상</span></a>
+      <a href="#read"><span class="en">Read &amp; listen</span><span class="ko">읽기·듣기</span></a>
+      <a href="#social"><span class="en">Social</span><span class="ko">SNS</span></a>
+      <a href="#quiet"><span class="en">Privacy</span><span class="ko">개인정보</span></a>
+      <a href="#download"><span class="en">Download</span><span class="ko">내려받기</span></a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang-btn="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow"><span class="en">Android · version 1.0.65</span><span class="ko">안드로이드 · 버전 1.0.65</span></span>
+          <h1>
+            <span class="en">A browser that fixes <span class="grad-text">the small things.</span></span>
+            <span class="ko">작은 불편을 하나씩 <span class="grad-text">없앤 브라우저.</span></span>
+          </h1>
+          <p class="sub">
+            <span class="en">MyBrowser is an Android browser built around the way people actually watch, read and listen. <b>Your own aspect ratio for any video, playback speed under your thumb, pages that read themselves, ads that never arrive and apps that can’t pull you away.</b> 152 KB. No account, no analytics, no ads of its own.</span>
+            <span class="ko">MyBrowser는 영상을 보고, 글을 읽고, 듣는 방식에 맞춰 만든 안드로이드 브라우저예요. <b>영상마다 원하는 화면비, 엄지 닿는 곳의 배속 버튼, 스스로 읽어 주는 페이지, 끝내 오지 않는 광고, 앱으로 끌고 가지 못하는 SNS.</b> 152KB. 계정도 분석 도구도 자체 광고도 없습니다.</span>
+          </p>
+          <div class="cta">
+            <a class="btn btn-primary" href="MyBrowser.apk" download="MyBrowser.apk">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L11 12.6V4a1 1 0 0 1 1-1ZM5 18a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1.5A1.5 1.5 0 0 1 18.5 22h-13A1.5 1.5 0 0 1 4 20.5V19a1 1 0 0 1 1-1Z"/></svg>
+              <span class="en">Download the APK · 1.0.65</span><span class="ko">APK 내려받기 · 1.0.65</span>
+            </a>
+            <a class="btn btn-ghost" href="#video"><span class="en">See what’s inside</span><span class="ko">기능 살펴보기</span></a>
+          </div>
+          <div class="chips">
+            <span class="chip"><span class="en">Android 8.0+</span><span class="ko">안드로이드 8.0 이상</span></span>
+            <span class="chip"><span class="en">152 KB</span><span class="ko">152KB</span></span>
+            <span class="chip"><span class="en">No account</span><span class="ko">계정 없음</span></span>
+            <span class="chip"><span class="en">No third-party libraries</span><span class="ko">외부 라이브러리 없음</span></span>
+          </div>
+        </div>
+
+        <div class="phone-col">
+          <div class="phone-wrap" aria-hidden="true">
+          <div class="float a"><svg viewBox="0 0 24 24"><path d="M12 2 4 14h6l-1 8 8-12h-6z"/></svg><span>0.25×–4×</span></div>
+          <div class="float b o"><svg viewBox="0 0 24 24"><path d="M12 5v11l4-4 1.4 1.4L12 20 6.6 13.4 8 12l4 4V5z"/></svg><span>⇊ <span class="en">auto scroll</span><span class="ko">자동 스크롤</span></span></div>
+          <div class="float c"><svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4z"/></svg><span><span class="en">ads &amp; trackers blocked</span><span class="ko">광고·추적 차단</span></span></div>
+
+          <div class="phone">
+            <div class="screen">
+              <div class="notch"></div>
+              <div class="bar">
+                <div class="url">youtube.com/<b>watch</b></div>
+                <span class="tbtn">⇊</span>
+                <span class="tbtn">⛶</span>
+                <span class="tbtn"><svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg></span>
+              </div>
+              <div class="video">
+                <div class="vpill"><span>−10s</span><span class="hot">1.5×</span><span>+10s</span></div>
+                <div class="vtag">4:3 · <span class="en">fit</span><span class="ko">맞춤</span></div>
+              </div>
+              <div class="article">
+                <h4><span class="en">A city where mountains meet the sea</span><span class="ko">산과 바다가 만나는 도시</span></h4>
+                <p>
+                  <span class="s-g">Mangwon is a place</span>
+                  <span class="s-o">바다와 산이 만나는 곳</span>
+                  <span class="s-p">山海相接之城</span>
+                  <span class="s-g">where the morning fog</span>
+                  <span class="s-o">아침 안개가</span>
+                  <span class="s-g">sits on the water until noon.</span>
+                </p>
+                <div style="margin-top:6px">
+                  <div class="ln w1"></div><div class="ln w2"></div><div class="ln w3"></div><div class="ln w4"></div>
+                </div>
+              </div>
+              <div class="bottom">
+                <span>‹</span><span>›</span><span>⌂</span>
+                <span><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 1-2 3.7v-7.4a4.5 4.5 0 0 1 2 3.7z"/></svg></span>
+                <span style="font-weight:700">文</span>
+                <span class="shieldb"><svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4z"/></svg><i>12</i></span>
+                <span>⋮</span>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <p class="mock-note">
+            <span class="en">Illustration of the in-app layout — toolbar, ⇊ auto-scroll, ⛶ full page, video controls, 文 translation tinting and the shield counter.</span>
+            <span class="ko">앱 화면 구성 그림 — 주소창 도구, ⇊ 자동 스크롤, ⛶ 전체 페이지, 영상 제어, 文 번역 색칠, 방패 차단 개수.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="stats reveal">
+        <div class="stat"><b>152 KB</b><span><span class="en">the whole app</span><span class="ko">앱 전체 크기</span></span></div>
+        <div class="stat"><b>5</b><span><span class="en">fullscreen ratios</span><span class="ko">전체화면 비율</span></span></div>
+        <div class="stat"><b>9</b><span><span class="en">playback speeds</span><span class="ko">재생 속도</span></span></div>
+        <div class="stat"><b>8</b><span><span class="en">languages detected</span><span class="ko">언어 자동 감지</span></span></div>
+        <div class="stat"><b>85</b><span><span class="en">ad &amp; tracker domains</span><span class="ko">광고·추적 도메인</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ORIGIN ============ -->
+  <section class="origin" aria-label="Origin">
+    <div class="wrap">
+      <div class="origin-in reveal">
+        <h2><span class="en">It began as one person’s browser.</span><span class="ko">한 사람의 브라우저로 시작했어요.</span></h2>
+        <p>
+          <span class="en">MyBrowser was built for a single foldable phone, one annoyance at a time — <b>a 4:3 crop for the inner screen</b>, a speed button where the thumb already rests, a tint that says which language a sentence is written in. Nothing here came out of a committee, and nothing here is a demo.</span>
+          <span class="ko">접이식 휴대폰 한 대를 위해, 불편을 하나씩 없애며 만들었어요. <b>안쪽 화면을 위한 4:3 비율</b>, 엄지가 닿는 자리의 배속 버튼, 문장이 무슨 언어인지 알려 주는 옅은 색까지. 회의실에서 나온 기능도, 시연용 기능도 없습니다.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIDEO ============ -->
+  <section class="sec" id="video">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="en">Watch</span><span class="ko">영상</span></span>
+        <h2><span class="en">Video stops being a compromise.</span><span class="ko">영상은 더 이상 양보하지 않아요.</span></h2>
+        <p class="lead">
+          <span class="en">Clips arrive in every shape and phones hand you whatever the site decides. Here you get the picture back — <b>the frame, the speed, the quality, and where it stops</b>.</span>
+          <span class="ko">영상은 제각각인데, 휴대폰은 사이트가 정한 대로만 보여 주죠. 여기서는 <b>화면비도, 배속도, 화질도, 멈춘 지점도</b> 직접 정할 수 있어요.</span>
+        </p>
+      </div>
+
+      <div class="cards">
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M8 12h8M12 8v8"/></svg></div>
+          <h3><span class="en">Any video, any shape</span><span class="ko">어떤 영상이든, 원하는 비율로</span></h3>
+          <p><span class="en">Five fullscreen ratios — <em>Fit, Fill, 4:3, 16:9 and Stretch</em> — switch with one button or from a long-press list. Drag the picture to the part you want, or pinch and use − / + to zoom between 0.25× and 4×. Your choice is remembered for the next video, and there’s a rotate button for when the phone guesses wrong.</span><span class="ko">전체화면 비율 <em>맞춤·꽉 채우기·4:3·16:9·늘리기</em> 다섯 가지를 버튼 하나로 바꾸거나, 길게 눌러 목록에서 골라요. 손가락으로 끌어 보이는 부분을 맞추고, 두 손가락이나 −·+ 버튼으로 0.25~4배까지 축소·확대해 고정할 수 있어요. 고른 값은 다음 영상에도 이어지고, 화면 회전 버튼도 따로 있습니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></div>
+          <h3><span class="en">Two kinds of fullscreen</span><span class="ko">전체화면도 두 가지</span></h3>
+          <p><span class="en"><em>⛶ beside the address bar</em> hides the toolbar and hands the whole screen to the page — on every site, with or without a video. On Instagram and other social sites a translucent circle floats beside the clip instead: it lifts just that one video and leaves the feed where it was.</span><span class="ko"><em>주소창 옆 ⛶ 버튼</em>은 주소창과 메뉴를 숨기고 페이지를 화면 가득 보여 줘요. 홈 화면만 빼고 모든 사이트에서, 영상이 없어도 쓸 수 있어요. 인스타그램 같은 SNS에서는 영상 옆에 반투명 회색 동그라미가 떠서 그 영상 하나만 들어 올려요. 피드는 그대로 둔 채로요.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0-7.5-5.2"/><path d="M12 12l4-3"/><path d="M4 20l.5-4.2"/></svg></div>
+          <h3><span class="en">Playback on your terms</span><span class="ko">배속과 10초, 내 손안에</span></h3>
+          <p><span class="en"><em>0.5× to 3× in nine steps</em>, remembered for the next video, plus −10s and +10s. On YouTube, tapping the picture brings up the same three controls without entering fullscreen, and a regular video reopens at <em>⏯ 3:21 where you left it</em>.</span><span class="ko"><em>0.5·0.75·1·1.25·1.5·1.75·2·2.5·3배</em> 아홉 단계를 고르면 다음 영상에도 그대로 이어져요. −10초·+10초 버튼도 함께 있고, 유튜브에서는 전체화면에 들어가지 않아도 영상을 누르면 같은 세 버튼이 3초 동안 떠요. 일반 영상은 <em>⏯ 3:21부터 이어보기</em>로 다시 이어집니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg></div>
+          <h3><span class="en">The best quality, already on</span><span class="ko">화질은 처음부터 최고로</span></h3>
+          <p><span class="en">YouTube opens at the highest resolution it can. If data or battery matter more, cap it at <em>1440p, 1080p or 720p</em> from the menu — or switch it off and let YouTube decide. A quality you changed by hand is left alone.</span><span class="ko">유튜브 영상은 열면 가장 높은 화질로 틀어요. 데이터나 배터리가 아쉬우면 메뉴에서 <em>1440p·1080p·720p</em>까지만 고르거나 끌 수 있어요. 직접 바꾼 화질은 앱이 건드리지 않습니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6l7 6-7 6V6z"/><path d="M13 6l7 6-7 6V6z"/><path d="M21 4v16"/></svg></div>
+          <h3><span class="en">Shorts that keep flowing</span><span class="ko">쇼츠는 자동으로 다음으로</span></h3>
+          <p><span class="en">On Shorts a <em>🔁 repeat / ⏭ auto</em> button appears beside the address bar: when a clip ends, the next one starts. The same switch sits in the fullscreen controls and the menu, so it’s never a hunt.</span><span class="ko">쇼츠에서는 주소창 옆에 <em>🔁 반복 / ⏭ 자동</em> 버튼이 나타나요. 영상이 끝나면 다음 쇼츠가 바로 시작돼요. 전체화면 제어창과 메뉴에도 같은 스위치가 있습니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2.5" y="13" width="4" height="7" rx="1.6"/><rect x="17.5" y="13" width="4" height="7" rx="1.6"/></svg></div>
+          <h3><span class="en">Sound with the screen off</span><span class="ko">화면이 꺼져도 소리는 계속</span></h3>
+          <p><span class="en">Leave the app, lock the phone — the audio keeps going. Play, pause and skip from the notification, the lock screen or your earbuds. You can turn the whole thing off in the menu.</span><span class="ko">앱을 나가거나 화면을 꺼도 소리는 계속 나와요. 알림창·잠금화면·이어폰 버튼으로 재생하고 멈출 수 있고, 메뉴에서 기능 자체를 끌 수도 있어요.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M10.5 12.5l4 2.5-4 2.5z"/></svg></div>
+          <h3><span class="en">Files that play in place</span><span class="ko">받기만 되던 영상도 바로 재생</span></h3>
+          <p><span class="en">Some video links would only ever download. MyBrowser asks whether to <em>save it or “Play here”</em> — and playing it opens the file inside the browser, with the ⛶ full-page button around it, instead of handing you a download.</span><span class="ko">다운로드로만 받아지던 영상 파일도 <em>‘여기서 보기’</em>를 누르면 브라우저 안에서 바로 재생돼요. 굳이 내려받지 않아도 되고, 주소창 옆 ⛶로 화면 가득 볼 수도 있습니다.</span></p>
+        </article>
+
+        <article class="card span2 reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h12M20 17h0"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="17" r="2"/></svg></div>
+          <h3><span class="en">Optional picture polish</span><span class="ko">영상 화질 개선(선택)</span></h3>
+          <p><span class="en">Film grain, sharpening, colour and contrast, scanlines or a grid — each with a strength slider that shows the change as you move it. Hold the button to peek at the original, and reset whenever. It’s a filter over the picture rather than AI upscaling, so it stays light on the phone.</span><span class="ko">필름 그레인, 선명하게, 색감·대비, 가로줄, 격자 — 각각 세기를 슬라이더로 조절하고 움직이는 대로 바로 확인할 수 있어요. 누르고 있으면 원본을 보여 주고, ‘처음대로’로 되돌립니다. AI가 아니라 화면에 효과를 덧씌우는 방식이라 휴대폰 부담이 적어요.</span></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ READ ============ -->
+  <section class="sec" id="read">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="en">Read &amp; listen</span><span class="ko">읽기·듣기</span></span>
+        <h2><span class="en">Pages that meet you halfway.</span><span class="ko">글은 읽기 편한 쪽으로.</span></h2>
+        <p class="lead">
+          <span class="en">Reading on a phone is usually a compromise too: too small, too fast, in the wrong language. <b>These are the buttons for that.</b></span>
+          <span class="ko">휴대폰으로 글을 읽는 일도 늘 타협이죠. 너무 작고, 너무 빠르고, 언어가 다르고. <b>그걸 위한 버튼들이 여기 있어요.</b></span>
+        </p>
+      </div>
+
+      <div class="cards">
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l4 4V6L7 10H4z"/><path d="M15 9a4.5 4.5 0 0 1 0 6"/><path d="M17.5 6.5a8 8 0 0 1 0 11"/></svg></div>
+          <h3><span class="en">Read aloud, properly</span><span class="ko">제대로 된 읽어주기</span></h3>
+          <p><span class="en">The whole page, or only the words you selected. <em>Seven speeds from 0.5× to 2×</em>, pitch control, separate female and male voices, a preview before you commit, and a choice of speech engine — Samsung’s or Google’s, whichever the phone has. ⏮ ⏯ ⏭ controls, and it keeps reading with the screen off — pause it from the lock screen.</span><span class="ko">페이지 전체, 또는 선택한 글자만 읽어 줘요. <em>속도 0.5~2배 일곱 단계</em>, 목소리 높낮이, 👩 여성·👨 남성 목소리, 고르기 전 미리 듣기, 삼성·구글 음성 엔진 선택까지. ⏮ ⏯ ⏭ 버튼이 있고, 화면이 꺼져도 계속 읽으며 잠금화면에서 일시정지할 수 있어요.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico txt">文</div>
+          <h3><span class="en">Translation mode</span><span class="ko">번역 모드 (文)</span></h3>
+          <p><span class="en">Switch it on and every sentence is tinted by the language it’s written in — <em>English green, Korean orange, Chinese pink, Japanese purple, French, Spanish and German sky blue, Russian teal</em>. Tap a sentence and Google AI Mode opens underneath with the translation: Korean becomes English, everything else becomes Korean, and the page itself is never rewritten. Eight languages are detected, and all twelve tint colours can be changed to your own scheme.</span><span class="ko">켜면 화면의 문장마다 언어를 알아내 옅게 칠해요. <em>영어=연두, 한국어=주황, 중국어=분홍, 일본어=보라, 프랑스어·스페인어·독일어=하늘, 러시아어=청록</em>. 문장을 누르면 아래 창에서 구글 AI 모드가 번역해 줘요. 한국어는 영어로, 나머지는 한국어로 — 원래 페이지는 그대로 둔 채로요. 여덟 언어를 알아내고, 언어별 색은 열두 가지 중에서 바꿀 수 있어요.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 4v13"/><path d="M7 12l5 5 5-5"/><path d="M5 21h14"/></svg></div>
+          <h3><span class="en">Auto scroll (⇊)</span><span class="ko">자동 스크롤 (⇊)</span></h3>
+          <p><span class="en">Hands-free reading at slow, medium or fast — or set your own <em>10–600 px/s</em> with three sliders. It pauses when you touch the page, carries on two seconds after you let go, starts again from the top at the end, and keeps the screen awake while it runs.</span><span class="ko">천천히·중간·빠르게 세 단계, 또는 슬라이더로 <em>10~600 px/초</em>를 직접 정해요. 화면을 만지면 잠깐 멈추고, 손을 떼고 2초 뒤 이어지고, 끝에 닿으면 맨 위로 올라가 다시 시작해요. 켜져 있는 동안 화면이 꺼지지 않습니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 19L9 5l5 14"/><path d="M6 14h6"/><path d="M16 19v-8"/><path d="M16 11c2.2 0 4 1.3 4 3.4S18.2 19 16 19"/></svg></div>
+          <h3><span class="en">Text size, per site</span><span class="ko">사이트별 글자 크기</span></h3>
+          <p><span class="en">Instagram at 120% while everything else stays at 100%. Pick <em>80–150%</em> for a single site or as the default for all; sites you haven’t set follow the default, and one button clears a site’s setting again.</span><span class="ko">인스타그램은 120%, 나머지는 100%처럼 사이트마다 따로 정해요. <em>80~150%</em> 중에서 ‘이 사이트만’과 ‘모든 사이트 기본’을 각각 고를 수 있고, 따로 정하지 않은 사이트는 기본을 따라요. ‘이 사이트 설정 지우기’로 되돌립니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M10.5 7.5v6M7.5 10.5h6"/></svg></div>
+          <h3><span class="en">Pinch to zoom, anywhere</span><span class="ko">확대를 막아 둔 사이트도</span></h3>
+          <p><span class="en">Sites that switch zoom off get it back — two fingers work on Instagram, on news sites and almost everywhere else. <em>YouTube is the one exception</em>, because tapping to seek would get in the way. The whole thing can be turned off in the menu.</span><span class="ko">확대를 막아 둔 사이트에서도 두 손가락으로 확대돼요. 인스타그램, 뉴스 사이트 등 거의 모든 곳에서요. <em>유튜브만 예외</em>인데, 두 번 탭 이동과 겹치기 때문이에요. 메뉴에서 기능을 끌 수 있습니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7z"/><path d="M17.5 15l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/></svg></div>
+          <h3><span class="en">Ask instead of searching</span><span class="ko">검색 대신 AI에게 묻기</span></h3>
+          <p><span class="en">Type in the address bar or the home search field and press <em>✦ AI</em>. Naver opens its AI tab, Google opens AI Mode, with your question already in it — no separate app, no API key, nothing to install.</span><span class="ko">주소창이나 홈 검색창에 검색어를 쓰고 <em>✦ AI</em> 버튼을 누르면 네이버는 AI 탭, 구글은 AI 모드가 검색어까지 채워진 채 열려요. 따로 앱을 깔거나 API 키를 넣을 필요가 없습니다.</span></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SOCIAL ============ -->
+  <section class="sec" id="social">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="en">Social</span><span class="ko">SNS</span></span>
+        <h2><span class="en">Instagram, without being pushed into the app.</span><span class="ko">인스타그램을, 앱으로 쫓겨나지 않고.</span></h2>
+        <p class="lead">
+          <span class="en">Social sites are built to hand you off to their app. Here <b>the page stays a page</b> — and reads like a feed when you want it to.</span>
+          <span class="ko">SNS는 무조건 앱으로 넘기려 하죠. 여기서는 <b>페이지가 페이지로 남고</b>, 원할 때는 피드처럼 넘겨 볼 수 있어요.</span>
+        </p>
+      </div>
+
+      <div class="cards">
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M3 21L21 3"/></svg></div>
+          <h3><span class="en">The page stays a page</span><span class="ko">페이지는 페이지로</span></h3>
+          <p><span class="en">Instagram, Facebook, Threads, TikTok, X, Reddit, LinkedIn, Pinterest and others try to launch their app on their own. MyBrowser blocks the jump and keeps you where you are, with a quiet note. <em>Tap “Open in app” yourself and it still opens</em> — the choice stays yours.</span><span class="ko">인스타그램·페이스북·스레드·틱톡·X·레딧·링크드인·핀터레스트 등이 스스로 앱을 열려고 하면 막고 브라우저에 그대로 머물러요. <em>‘앱에서 열기’를 직접 누르면 그때는 앱이 열립니다.</em> 선택은 사용자 몫으로 남겨 둬요.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="6" width="13" height="12" rx="2"/><path d="M16.5 12H21M21 12l-3-3M21 12l-3 3"/></svg></div>
+          <h3><span class="en">One video, full screen</span><span class="ko">그 영상 하나만 크게</span></h3>
+          <p><span class="en">The floating circle enlarges just the clip you’re watching, then gives it back. It isn’t the browser’s fullscreen API, so the feed doesn’t redraw and quietly swap in a different video. The controls appear once, then a tap near the top brings them back.</span><span class="ko">떠 있는 동그라미를 누르면 보고 있던 영상 하나만 커져요. 브라우저의 전체화면 API를 쓰지 않아서 피드가 다시 그려지며 다른 영상으로 바뀌는 일이 없어요. 제어창은 처음 한 번만 뜨고, 화면 위쪽을 톡 하면 다시 나옵니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.4"/><path d="M12 8v8M9 11l3-3 3 3"/></svg></div>
+          <h3><span class="en">A profile that swipes like Shorts</span><span class="ko">프로필을 쇼츠처럼 넘겨보기</span></h3>
+          <p><span class="en">Open a post from a profile and swipe up for the next one, down for the previous — comments still scroll normally. Turn on <em>⇊</em> and it moves by itself: videos play to the end, photos wait 8, 5 or 3 seconds depending on the speed you chose, carousels advance page by page, and the last post loops back to the first.</span><span class="ko">프로필에서 게시물을 열고 위로 쓸면 다음, 아래로 쓸면 이전 게시물로 넘어가요. 댓글은 평소처럼 스크롤돼요. <em>⇊</em>를 켜 두면 알아서 넘어갑니다. 영상은 끝까지 보고, 사진은 고른 속도에 따라 8·5·3초, 여러 장 게시물은 장마다 보고, 마지막 다음엔 첫 게시물로 돌아가 반복해요.</span></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRIVACY ============ -->
+  <section class="sec" id="quiet">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="en">Quiet by default</span><span class="ko">기본값이 조용함</span></span>
+        <h2><span class="en">Ads and pop-ups that simply don’t appear.</span><span class="ko">광고와 팝업은 아예 나타나지 않아요.</span></h2>
+        <p class="lead">
+          <span class="en">The quiet is the point. No ad window, no hand-off to an app, <b>nothing collected about you on the way</b>.</span>
+          <span class="ko">조용함이 핵심이에요. 광고 창도, 앱으로 넘기는 일도, <b>그 사이에 수집되는 것도 없습니다</b>.</span>
+        </p>
+      </div>
+
+      <div class="cards">
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2.5 3.5 6v5.6c0 5.2 3.6 10.1 8.5 11.4 4.9-1.3 8.5-6.2 8.5-11.4V6L12 2.5z"/><path d="M8.6 12l2.4 2.4 4.4-4.6"/></svg></div>
+          <h3><span class="en">A blocklist you can read</span><span class="ko">눈으로 읽는 차단 목록</span></h3>
+          <p><span class="en"><em>85 domains</em> — Google’s ad and analytics services, the Korean networks (Naver, Daum, Mobon, Cauly, Tenping and more) and well-known trackers — stopped before the page loads them. The list is a plain text file with one domain per line, inside the app. The shield in the bottom bar counts what was blocked here, and the home screen keeps the all-time total.</span><span class="ko">구글 광고·분석, 국내 광고 네트워크(네이버·다음·모본·카울리·텐핑 등), 잘 알려진 추적기까지 <em>85개 도메인</em>을 페이지가 불러오기 전에 막아요. 목록은 도메인 한 줄씩 적힌 평범한 텍스트 파일로 앱 안에 들어 있어요. 하단 방패는 이 페이지에서 막은 개수를, 홈 화면은 지금까지의 합계를 보여 줍니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="12" height="9" rx="1.8"/><rect x="11" y="11" width="10" height="8" rx="1.8"/><path d="M4 20L20 4"/></svg></div>
+          <h3><span class="en">No pop-up windows</span><span class="ko">팝업 창은 열리지 않아요</span></h3>
+          <p><span class="en">Links that ask for a new window open in the same view instead, so an ad can’t take over a second window — and the back button always takes you where you expected.</span><span class="ko">새 창을 요청하는 링크는 같은 화면에서 열려요. 광고가 두 번째 창을 차지할 수 없고, 뒤로 가기도 예상대로 돌아갑니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10.5" rx="2.4"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/><path d="M12 14v3"/></svg></div>
+          <h3><span class="en">Nothing collected</span><span class="ko">아무것도 수집하지 않아요</span></h3>
+          <p><span class="en">No account, no sign-in, no analytics SDK, no crash reporter, no ads of its own. Settings are plain local preferences on your phone. Apart from the pages you open, the app’s own code makes one request: fetching an image when you ask for a Google Lens search.</span><span class="ko">계정도 로그인도, 분석 SDK도, 오류 수집기도, 자체 광고도 없어요. 설정은 휴대폰 안의 평범한 저장값일 뿐입니다. 여는 페이지를 빼면 앱 코드가 직접 통신하는 곳은 ‘구글 렌즈로 검색’을 눌렀을 때 사진을 받아 오는 한 곳뿐이에요.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><circle cx="8" cy="8.5" r="3.5"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5h5.5M16 9h5.5M16 12.5h3.5"/></svg></div>
+          <h3><span class="en">Only the permissions it uses</span><span class="ko">쓰는 권한만 요청해요</span></h3>
+          <p><span class="en">Internet, the microphone when a page asks, playback notifications, audio settings, and storage on Android 9 and older for downloads. <em>No location, no contacts, no camera.</em></span><span class="ko">인터넷, 페이지가 요청할 때의 마이크, 재생 알림, 오디오 설정, 그리고 안드로이드 9 이하의 다운로드 저장소까지예요. <em>위치도 연락처도 카메라도 쓰지 않습니다.</em></span></p>
+        </article>
+
+        <article class="card span2 reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 3 12 2.5-8 2 4H21"/></svg></div>
+          <h3><span class="en">Built on almost nothing</span><span class="ko">거의 아무것도 얹지 않은 앱</span></h3>
+          <p><span class="en">Pure Java over the Android WebView. No AndroidX, no third-party libraries, no web framework inside the app — which is why the whole thing fits in 152 KB and has nothing to phone home with.</span><span class="ko">안드로이드 웹뷰 위에 순수 자바로만 만들었어요. 안드로이드X도, 외부 라이브러리도, 앱 안의 웹 프레임워크도 없습니다. 그래서 앱 전체가 152KB에 들어가고, 몰래 신호를 보낼 코드도 없어요.</span></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DETAILS ============ -->
+  <section class="sec" id="details">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="en">The details</span><span class="ko">자잘한 것들</span></span>
+        <h2><span class="en">Things you’d only notice if they were missing.</span><span class="ko">없으면 아쉬운 것들.</span></h2>
+      </div>
+
+      <div class="minis">
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2.4"/><circle cx="9" cy="10" r="1.6"/><path d="M3.5 17l5-4.5 4 3.5 3-2.5 5 4"/></svg></div>
+          <div>
+            <h3><span class="en">Image → Google Lens</span><span class="ko">사진 → 구글 렌즈</span></h3>
+            <p><span class="en">Long-press a picture and choose <em>Search with Google Lens</em>. The original file is fetched with your cookies and user agent, so it works on Instagram photos that need a login — and needs no tokens. Without the Google app, the share sheet opens instead.</span><span class="ko">사진을 길게 눌러 <em>구글 렌즈로 검색</em>을 고르면 원본 사진을 쿠키·User-Agent와 함께 다시 받아 와서 구글 앱으로 넘겨요. 로그인해야 보이는 인스타그램 사진도 되고, 토큰도 쓰지 않아요. 구글 앱이 없으면 공유 창이 열립니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M8.5 21h7"/></svg></div>
+          <div>
+            <h3><span class="en">Voice input on web pages</span><span class="ko">웹페이지 음성 입력</span></h3>
+            <p><span class="en">Google AI Mode and search boxes can use the microphone. Google and Naver are allowed straight away; other sites ask once and are remembered.</span><span class="ko">구글 AI 모드와 검색창에서 마이크를 쓸 수 있어요. 구글·네이버는 바로 허용되고, 다른 사이트는 처음 한 번 물어본 뒤 기억합니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6.5V4h3M20 6.5V4h-3M4 17.5V20h3M20 17.5V20h-3"/><path d="M7.5 9h9M7.5 12.5h6"/></svg></div>
+          <div>
+            <h3><span class="en">Select, then act</span><span class="ko">골라서 바로 쓰기</span></h3>
+            <p><span class="en">Long-press a passage and the selection menu can <em>read it aloud</em> or hand it to <em>文 AI translation</em> — without leaving the page you were reading.</span><span class="ko">아무 페이지에서나 글자를 길게 눌러 선택하면 나오는 메뉴에서 <em>🔊 읽어주기</em>와 <em>文 AI 번역</em>을 바로 쓸 수 있어요. 읽던 곳을 떠나지 않고요.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="9.5" r="1.2"/><circle cx="15.5" cy="9.5" r="1.2"/><circle cx="8.5" cy="15" r="1.2"/><circle cx="15.5" cy="15" r="1.2"/></svg></div>
+          <div>
+            <h3><span class="en">Six themes</span><span class="ko">테마 여섯 가지</span></h3>
+            <p><span class="en">Blue, green, purple, orange, pink or charcoal — with a clock on the home screen that follows your colour.</span><span class="ko">블루·그린·퍼플·오렌지·핑크·차콜. 홈 화면 시계도 고른 색을 따라가요.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><path d="M17.2 13v8M13.2 17h8"/></svg></div>
+          <div>
+            <h3><span class="en">Home shortcuts</span><span class="ko">홈 바로가기</span></h3>
+            <p><span class="en">Your own tiles: remove with a long press or <em>Edit</em>, add with <em>+</em>, or save the page you’re on from the menu.</span><span class="ko">자주 가는 사이트 타일을 직접 관리해요. 길게 누르거나 <em>편집</em>으로 지우고, <em>+</em>로 추가하고, 메뉴에서 지금 보고 있는 페이지를 바로 담을 수 있어요.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="17" cy="17" r="2"/></svg></div>
+          <div>
+            <h3><span class="en">A menu that fits</span><span class="ko">정리된 메뉴</span></h3>
+            <p><span class="en">Share &amp; copy, Read aloud, Video, Text size, Page and App settings — the same features in one tap fewer.</span><span class="ko">링크 공유·복사, 읽어주기, 영상, 글자 크기, 페이지 설정, 앱 설정으로 묶었어요. 기능은 그대로, 누르는 횟수는 줄어요.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c-4 4.5-4 13.5 0 18 4-4.5 4-13.5 0-18z"/></svg></div>
+          <div>
+            <h3><span class="en">A real browser</span><span class="ko">브라우저로서도 제대로</span></h3>
+            <p><span class="en">Naver, Google or Daum, desktop mode, downloads, photo uploads, card-issuer and KakaoTalk app links — and yes, you can set it as your default browser.</span><span class="ko">네이버·구글·다음 검색엔진, PC 버전 보기, 파일 다운로드, 사진 업로드, 카드사·카카오톡 앱 연결까지. 기본 브라우저로도 설정할 수 있어요.</span></p>
+          </div>
+        </article>
+
+        <article class="mini span2 reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4.5l3 2"/></svg></div>
+          <div>
+            <h3><span class="en">Version in plain sight</span><span class="ko">버전이 눈에 보여요</span></h3>
+            <p><span class="en">The APK number sits at the bottom of App settings, so you always know exactly what’s installed.</span><span class="ko">점 3개 메뉴 → 앱 설정 맨 아래에 <em>버전 1.0.N</em>이 적혀 있어요. 지금 깔린 APK가 몇 번인지 바로 알 수 있습니다.</span></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DOWNLOAD ============ -->
+  <section class="sec" id="download">
+    <div class="wrap">
+      <div class="dl reveal">
+        <div>
+          <span class="eyebrow"><span class="en">Install</span><span class="ko">설치</span></span>
+          <h2><span class="en">Get MyBrowser.</span><span class="ko">MyBrowser 받기</span></h2>
+          <div class="dl-meta">
+            <span><span class="en">Version 1.0.65</span><span class="ko">버전 1.0.65</span></span>
+            <span>152 KB</span>
+            <span><span class="en">Android 8.0 or newer</span><span class="ko">안드로이드 8.0 이상</span></span>
+          </div>
+          <ol class="steps">
+            <li><span class="en"><b>Download</b> MyBrowser.apk on your phone.</span><span class="ko">휴대폰에서 <b>MyBrowser.apk</b>를 내려받아요.</span></li>
+            <li><span class="en"><b>Open the file</b> and allow installs from this source when Android asks.</span><span class="ko">받은 파일을 누르고, 안드로이드가 물으면 <b>출처를 알 수 없는 앱 허용</b>을 켜요.</span></li>
+            <li><span class="en"><b>Install.</b> A newer version replaces the old one in place — shortcuts and settings stay.</span><span class="ko"><b>설치</b>하면 끝이에요. 새 버전은 그대로 덮어 설치되고, 바로가기와 설정은 남아요.</span></li>
+          </ol>
+          <div class="dl-actions">
+            <a class="btn btn-primary" href="MyBrowser.apk" download="MyBrowser.apk">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L11 12.6V4a1 1 0 0 1 1-1ZM5 18a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1.5A1.5 1.5 0 0 1 18.5 22h-13A1.5 1.5 0 0 1 4 20.5V19a1 1 0 0 1 1-1Z"/></svg>
+              <span class="en">Download MyBrowser.apk</span><span class="ko">MyBrowser.apk 내려받기</span>
+            </a>
+            <p class="dl-fine">
+              <span class="en">A direct APK, signed by the project’s own build. Nothing else is installed and no account is created.</span>
+              <span class="ko">프로젝트 자체 빌드로 서명한 APK예요. 따로 설치되는 것도, 만들어지는 계정도 없습니다.</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="aside">
+          <div class="note privacy">
+            <h3><svg viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10.5" rx="2.4"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg><span class="en">This page collects nothing either</span><span class="ko">이 페이지도 아무것도 수집하지 않아요</span></h3>
+            <p><span class="en">No cookies, no analytics, no fonts or scripts from anywhere else. Your language choice is kept in your own browser and nowhere else.</span><span class="ko">쿠키도, 분석 도구도, 바깥에서 불러오는 글꼴이나 스크립트도 없어요. 고른 언어는 브라우저 안에만 남습니다.</span></p>
+          </div>
+          <div class="note">
+            <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".6" fill="currentColor" stroke="none"/></svg><span class="en">About the iPhone build</span><span class="ko">아이폰 버전 안내</span></h3>
+            <p><span class="en">On hold. There is an IPA from 19 November 2026, but it is behind the Android version, needs a Windows PC with Sideloadly, and a free Apple ID has to be re-signed every seven days.</span><span class="ko">지금은 잠시 멈춰 있어요. 2026년 11월 19일 버전의 IPA가 남아 있지만 안드로이드 버전보다 기능이 뒤처져 있고, 윈도우 PC와 Sideloadly가 필요하며, 무료 Apple ID는 7일마다 다시 설치해야 합니다.</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <a class="brand" href="#top">
+        <svg class="mark" viewBox="0 0 96 96" aria-hidden="true">
+          <rect width="96" height="96" rx="24" fill="#070D24"/>
+          <g transform="rotate(-18 48 48)"><path d="M14 48 A34 10 0 0 1 82 48" fill="none" stroke="#FB923C" stroke-width="2.6" stroke-opacity=".55"/></g>
+          <circle cx="48" cy="48" r="21" fill="#3D6BFF"/>
+          <ellipse cx="48" cy="48" rx="8.6" ry="21" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.3"/>
+          <path d="M45 39.5 L56.5 48 L45 56.5 Z" fill="#fff"/>
+          <g transform="rotate(-18 48 48)"><path d="M82 48 A34 10 0 0 1 14 48" fill="none" stroke="#FB923C" stroke-width="2.6"/></g>
+        </svg>
+        <span>MyBrowser<small>v1.0.65 · Android</small></span>
+      </a>
+      <div class="foot-links">
+        <a href="#video"><span class="en">Video</span><span class="ko">영상</span></a>
+        <a href="#read"><span class="en">Read &amp; listen</span><span class="ko">읽기·듣기</span></a>
+        <a href="#quiet"><span class="en">Privacy</span><span class="ko">개인정보</span></a>
+        <a href="#download"><span class="en">Download</span><span class="ko">내려받기</span></a>
+      </div>
+      <p class="foot-note">
+        <span class="en">MyBrowser is an Android browser. Every feature described here was checked against the app’s own source, and the phone picture is an illustration of that interface. © 2026</span>
+        <span class="ko">MyBrowser는 안드로이드 브라우저예요. 여기 적힌 기능은 모두 앱 소스에서 하나씩 확인했고, 휴대폰 그림은 그 인터페이스를 그린 삽화예요. © 2026</span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var root = document.documentElement;
+  var buttons = document.querySelectorAll("[data-lang-btn]");
+  var titles = {
+    en: "MyBrowser — a browser that fixes the small things",
+    ko: "MyBrowser — 작은 불편을 하나씩 없앤 브라우저"
+  };
+  var descriptions = {
+    en: "MyBrowser is a 152 KB Android browser built around the way people watch, read and listen: your own video aspect ratio, playback speed under your thumb, pages that read themselves, a translation mode, and no ads or app-jumps. No account, no analytics, no ads of its own.",
+    ko: "MyBrowser는 영상과 읽기, 듣기에 맞춰 만든 152KB 안드로이드 브라우저예요. 원하는 화면비, 엄지 닿는 배속 버튼, 읽어주기, 번역 모드, 광고와 앱 강제 이동 차단까지. 계정도 분석 도구도 없습니다."
+  };
+  var metaDesc = document.querySelector('meta[name="description"]');
+
+  function setLang(lang, remember) {
+    var l = lang === "ko" ? "ko" : "en";
+    root.setAttribute("data-lang", l);
+    root.setAttribute("lang", l);
+    document.title = titles[l];
+    if (metaDesc) metaDesc.setAttribute("content", descriptions[l]);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-lang-btn") === l ? "true" : "false");
+    }
+    if (remember) {
+      try { window.localStorage.setItem("mybrowser-intro-lang", l); } catch (e) {}
+    }
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function () {
+      setLang(this.getAttribute("data-lang-btn"), true);
+    });
+  }
+
+  var saved = null;
+  try { saved = window.localStorage.getItem("mybrowser-intro-lang"); } catch (e) {}
+  setLang(saved === "ko" ? "ko" : "en", false);
+
+  var nav = document.getElementById("nav");
+  var onScroll = function () {
+    if (!nav) return;
+    if (window.pageYOffset > 8) nav.classList.add("scrolled");
+    else nav.classList.remove("scrolled");
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  var reduce = false;
+  try { reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+  var items = document.querySelectorAll(".reveal");
+
+  if (reduce || !("IntersectionObserver" in window)) {
+    for (var j = 0; j < items.length; j++) items[j].classList.add("in");
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      for (var k = 0; k < entries.length; k++) {
+        if (entries[k].isIntersecting) {
+          entries[k].target.classList.add("in");
+          io.unobserve(entries[k].target);
+        }
+      }
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    for (var m = 0; m < items.length; m++) io.observe(items[m]);
+  }
+})();
+</script>
+</body>
+</html>
