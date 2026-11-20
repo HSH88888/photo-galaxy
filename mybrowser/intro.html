@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MyBrowser — a browser that fixes the small things</title>
 <script>document.documentElement.classList.add("js");</script>
-<meta name="description" content="MyBrowser is a 152 KB Android browser built around the way people watch, read and listen: your own video aspect ratio, playback speed under your thumb, pages that read themselves, a translation mode, and no ads or app-jumps. No account, no analytics, no ads of its own.">
+<meta name="description" content="MyBrowser is a 172 KB Android browser built around the way people watch, read and listen: your own video aspect ratio, playback speed under your thumb, a slider for Bluetooth sound that runs ahead, pages that read themselves, a translation mode, an AI that answers about the sentence you tap, and no ads or app-jumps. No account, no analytics, no ads of its own.">
 <meta name="theme-color" content="#050917">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MyBrowser — a browser that fixes the small things">
-<meta property="og:description" content="A 152 KB Android browser with real video controls, read-aloud, translation, auto-scroll and quiet ad blocking. No account, no analytics, no ads of its own.">
+<meta property="og:description" content="A 172 KB Android browser with real video controls, Bluetooth audio sync, read-aloud, translation, AI answers about the sentence you tap, auto-scroll and quiet ad blocking. No account, no analytics, no ads of its own.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23070D24'/%3E%3Cellipse cx='32' cy='32' rx='25' ry='8' fill='none' stroke='%23FB923C' stroke-width='3' transform='rotate(-18 32 32)'/%3E%3Ccircle cx='32' cy='32' r='15' fill='%233D6BFF'/%3E%3Cpath d='M30 26 L39 32 L30 38 Z' fill='%23fff'/%3E%3C/svg%3E">
 <style>
   :root{
@@ -217,6 +217,7 @@
   .card p{color:var(--muted);font-size:.93rem;line-height:1.72}
   .card.span2 p{max-width:72ch}
   .card p em{font-style:normal;color:#CBD6F2}
+  .mini p em{font-style:normal;color:#CBD6F2}
 
   /* ---------- compact details ---------- */
   .minis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
@@ -226,6 +227,7 @@
   .mini h3{font-size:.96rem;margin-bottom:4px}
   .mini p{color:var(--muted);font-size:.87rem;line-height:1.62}
   .mini.span2 p{max-width:82ch}
+  .ver{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.05em;color:#9BE1FF;border:1px solid rgba(103,232,249,.3);background:rgba(103,232,249,.09);padding:1px 7px;border-radius:999px;vertical-align:2px;margin-left:7px;white-space:nowrap}
 
   /* ---------- download ---------- */
   .dl{position:relative;border-radius:28px;overflow:hidden;border:1px solid rgba(103,232,249,.22);
@@ -335,9 +337,10 @@
           <circle cx="81" cy="48" r="2.7" fill="#FDBA74"/>
         </g>
       </svg>
-      <span>MyBrowser<small>v1.0.65 · Android</small></span>
+      <span>MyBrowser<small>v1.0.75 · Android</small></span>
     </a>
     <nav class="nav-links" aria-label="Sections">
+      <a href="#new"><span class="en">What’s new</span><span class="ko">새 소식</span></a>
       <a href="#video"><span class="en">Video</span><span class="ko">영상</span></a>
       <a href="#read"><span class="en">Read &amp; listen</span><span class="ko">읽기·듣기</span></a>
       <a href="#social"><span class="en">Social</span><span class="ko">SNS</span></a>
@@ -357,25 +360,25 @@
     <div class="wrap">
       <div class="hero-grid">
         <div>
-          <span class="eyebrow"><span class="en">Android · version 1.0.65</span><span class="ko">안드로이드 · 버전 1.0.65</span></span>
+          <span class="eyebrow"><span class="en">Android · version 1.0.75</span><span class="ko">안드로이드 · 버전 1.0.75</span></span>
           <h1>
             <span class="en">A browser that fixes <span class="grad-text">the small things.</span></span>
             <span class="ko">작은 불편을 하나씩 <span class="grad-text">없앤 브라우저.</span></span>
           </h1>
           <p class="sub">
-            <span class="en">MyBrowser is an Android browser built around the way people actually watch, read and listen. <b>Your own aspect ratio for any video, playback speed under your thumb, pages that read themselves, ads that never arrive and apps that can’t pull you away.</b> 152 KB. No account, no analytics, no ads of its own.</span>
-            <span class="ko">MyBrowser는 영상을 보고, 글을 읽고, 듣는 방식에 맞춰 만든 안드로이드 브라우저예요. <b>영상마다 원하는 화면비, 엄지 닿는 곳의 배속 버튼, 스스로 읽어 주는 페이지, 끝내 오지 않는 광고, 앱으로 끌고 가지 못하는 SNS.</b> 152KB. 계정도 분석 도구도 자체 광고도 없습니다.</span>
+            <span class="en">MyBrowser is an Android browser built around the way people actually watch, read and listen. <b>Your own aspect ratio for any video, playback speed under your thumb, a slider for Bluetooth sound that runs ahead, pages that read themselves, ads that never arrive and apps that can’t pull you away.</b> 172 KB. No account, no analytics, no ads of its own.</span>
+            <span class="ko">MyBrowser는 영상을 보고, 글을 읽고, 듣는 방식에 맞춰 만든 안드로이드 브라우저예요. <b>영상마다 원하는 화면비, 엄지 닿는 곳의 배속 버튼, 블루투스 소리가 앞설 때 늦춰 주는 슬라이더, 스스로 읽어 주는 페이지, 끝내 오지 않는 광고, 앱으로 끌고 가지 못하는 SNS.</b> 172KB. 계정도 분석 도구도 자체 광고도 없습니다.</span>
           </p>
           <div class="cta">
             <a class="btn btn-primary" href="MyBrowser.apk" download="MyBrowser.apk">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.6l2.3-2.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L11 12.6V4a1 1 0 0 1 1-1ZM5 18a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1.5A1.5 1.5 0 0 1 18.5 22h-13A1.5 1.5 0 0 1 4 20.5V19a1 1 0 0 1 1-1Z"/></svg>
-              <span class="en">Download the APK · 1.0.65</span><span class="ko">APK 내려받기 · 1.0.65</span>
+              <span class="en">Download the APK · 1.0.75</span><span class="ko">APK 내려받기 · 1.0.75</span>
             </a>
             <a class="btn btn-ghost" href="#video"><span class="en">See what’s inside</span><span class="ko">기능 살펴보기</span></a>
           </div>
           <div class="chips">
             <span class="chip"><span class="en">Android 8.0+</span><span class="ko">안드로이드 8.0 이상</span></span>
-            <span class="chip"><span class="en">152 KB</span><span class="ko">152KB</span></span>
+            <span class="chip"><span class="en">172 KB</span><span class="ko">172KB</span></span>
             <span class="chip"><span class="en">No account</span><span class="ko">계정 없음</span></span>
             <span class="chip"><span class="en">No third-party libraries</span><span class="ko">외부 라이브러리 없음</span></span>
           </div>
@@ -417,6 +420,7 @@
               <div class="bottom">
                 <span>‹</span><span>›</span><span>⌂</span>
                 <span><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 1-2 3.7v-7.4a4.5 4.5 0 0 1 2 3.7z"/></svg></span>
+                <span style="font-weight:700;font-size:8px">AI</span>
                 <span style="font-weight:700">文</span>
                 <span class="shieldb"><svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4z"/></svg><i>12</i></span>
                 <span>⋮</span>
@@ -426,14 +430,14 @@
           </div>
 
           <p class="mock-note">
-            <span class="en">Illustration of the in-app layout — toolbar, ⇊ auto-scroll, ⛶ full page, video controls, 文 translation tinting and the shield counter.</span>
-            <span class="ko">앱 화면 구성 그림 — 주소창 도구, ⇊ 자동 스크롤, ⛶ 전체 페이지, 영상 제어, 文 번역 색칠, 방패 차단 개수.</span>
+            <span class="en">Illustration of the in-app layout — toolbar, ⇊ auto-scroll, ⛶ full page, video controls, the AI and 文 buttons, translation tinting and the shield counter.</span>
+            <span class="ko">앱 화면 구성 그림 — 주소창 도구, ⇊ 자동 스크롤, ⛶ 전체 페이지, 영상 제어, AI·文 버튼, 번역 색칠, 방패 차단 개수.</span>
           </p>
         </div>
       </div>
 
       <div class="stats reveal">
-        <div class="stat"><b>152 KB</b><span><span class="en">the whole app</span><span class="ko">앱 전체 크기</span></span></div>
+        <div class="stat"><b>172 KB</b><span><span class="en">the whole app</span><span class="ko">앱 전체 크기</span></span></div>
         <div class="stat"><b>5</b><span><span class="en">fullscreen ratios</span><span class="ko">전체화면 비율</span></span></div>
         <div class="stat"><b>9</b><span><span class="en">playback speeds</span><span class="ko">재생 속도</span></span></div>
         <div class="stat"><b>8</b><span><span class="en">languages detected</span><span class="ko">언어 자동 감지</span></span></div>
@@ -451,6 +455,94 @@
           <span class="en">MyBrowser was built for a single foldable phone, one annoyance at a time — <b>a 4:3 crop for the inner screen</b>, a speed button where the thumb already rests, a tint that says which language a sentence is written in. Nothing here came out of a committee, and nothing here is a demo.</span>
           <span class="ko">접이식 휴대폰 한 대를 위해, 불편을 하나씩 없애며 만들었어요. <b>안쪽 화면을 위한 4:3 비율</b>, 엄지가 닿는 자리의 배속 버튼, 문장이 무슨 언어인지 알려 주는 옅은 색까지. 회의실에서 나온 기능도, 시연용 기능도 없습니다.</span>
         </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHAT'S NEW ============ -->
+  <section class="sec" id="new">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow"><span class="en">What’s new</span><span class="ko">새로워진 것</span></span>
+        <h2><span class="en">Ten builds since this page was written.</span><span class="ko">이 페이지를 쓴 뒤로 열 번의 빌드.</span></h2>
+        <p class="lead">
+          <span class="en">Between 1.0.65 and 1.0.75 the app gained two buttons and lost a handful of annoyances — nearly all of them found by using it, not by reading a checklist.</span>
+          <span class="ko">1.0.65에서 1.0.75 사이에 버튼 두 개가 생기고, 성가신 것 몇 가지가 사라졌어요. 대부분 체크리스트가 아니라 실제로 쓰면서 나온 것들입니다.</span>
+        </p>
+      </div>
+
+      <div class="minis">
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg></div>
+          <div>
+            <h3><span class="en">Ask AI about the sentence you tap</span><span class="ko">누른 문장을 AI에게</span><span class="ver">1.0.73</span></h3>
+            <p><span class="en">A new AI button between 🔊 and 文. Tap a sentence and it goes to Google AI Mode word for word — with an optional “explain simply” or your own line after it. No token is used.</span><span class="ko">🔊와 文 사이에 <em>AI</em> 버튼이 생겼어요. 문장을 누르면 그대로 구글 AI 모드에 물어보고, 뒤에 ‘뜻을 쉽게 설명해줘’ 같은 말을 붙일 수도 있어요. 토큰은 쓰지 않습니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="13.5" width="4" height="6.5" rx="1.6"/><rect x="17.5" y="13.5" width="4" height="6.5" rx="1.6"/></svg></div>
+          <div>
+            <h3><span class="en">A slider for Bluetooth sound that runs ahead</span><span class="ko">블루투스 소리 싱크 슬라이더</span><span class="ver">1.0.69</span></h3>
+            <p><span class="en">With some earbuds the audio led the picture by about a third of a second. Now you can hold it back 0–800 ms, set per output device, while the phone’s own speaker stays at zero.</span><span class="ko">이어폰에 따라 소리가 영상보다 0.3초쯤 먼저 들렸어요. 이제 0~800ms 사이에서 늦춰 맞출 수 있고, 값은 출력 기기마다 따로 저장됩니다. 폰 스피커는 0으로 둡니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico txt">文</div>
+          <div>
+            <h3><span class="en">The 文 request lines are yours</span><span class="ko">文 해석 요청 문구를 직접</span><span class="ver">1.0.74</span></h3>
+            <p><span class="en">The three sentences the translation panel puts in front of a passage can be rewritten or left empty, so a question can go out as just the sentence.</span><span class="ko">번역 창이 문장 앞에 붙이던 세 가지 말을 직접 고치거나 비울 수 있어요. 비우면 문장만 보냅니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M2.5 21L21 3"/></svg></div>
+          <div>
+            <h3><span class="en">Instagram keeps one shape on the fold</span><span class="ko">폴드에서도 인스타그램은 한 모양</span><span class="ver">1.0.71</span></h3>
+            <p><span class="en">Opening, folding or turning the phone no longer changes the layout, photo size or fonts — a wide screen now shows the phone layout, enlarged.</span><span class="ko">앱을 열거나 접고 펼치고 돌려도 모양과 사진·글자 크기가 더는 달라지지 않아요. 넓은 화면에서는 휴대폰 모양을 크게 보여 줍니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.4"/><path d="M12 8v8M9 11l3-3 3 3"/></svg></div>
+          <div>
+            <h3><span class="en">Carousels: first photo, then the next post</span><span class="ko">여러 장 게시물은 첫 장만</span><span class="ver">1.0.72</span></h3>
+            <p><span class="en">With ⇊ on, a post of several photos shows its first photo for the time you chose and moves on to the next post, instead of walking through the rest.</span><span class="ko">⇊를 켜 두면 여러 장 사진 게시물은 첫 장을 고른 시간만큼 보여 주고 바로 다음 게시물로 넘어가요. 나머지 장은 넘기지 않습니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M8 12h8M12 8v8"/></svg></div>
+          <div>
+            <h3><span class="en">Controls that stay out of the way</span><span class="ko">제어창이 덜 튀어나옴</span><span class="ver">1.0.70</span></h3>
+            <p><span class="en">⛶ and video controls appear once when you go in; after that only a tap near the top of the screen brings them back — on every site, so scrolling no longer summons them.</span><span class="ko">⛶·영상 제어창은 들어갈 때 한 번만 뜨고, 그 뒤에는 화면 위쪽을 톡 할 때만 다시 나와요. 모든 사이트에서요. 스크롤해도 제어창이 따라 나오지 않습니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></div>
+          <div>
+            <h3><span class="en">The playback notification, actually there</span><span class="ko">재생 알림이 이제 뜹니다</span><span class="ver">1.0.66</span></h3>
+            <p><span class="en">It no longer waits for the page to report playback: a video that started early, or plays inside an article, keeps its notification and keeps playing after you leave. Notifications off for the browser? It says so once.</span><span class="ko">이제 페이지가 재생을 알려 주기를 기다리지 않아요. 일찍 시작된 영상이나 기사 안에 박힌 영상도 알림이 뜨고, 앱을 나가도 계속 재생됩니다. 알림이 꺼져 있으면 한 번 알려 줍니다.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="10.5" rx="2.4"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/><path d="M12 14v3"/></svg></div>
+          <div>
+            <h3><span class="en">Four things that keep browsing yours</span><span class="ko">내 기록을 지키는 네 가지</span><span class="ver">1.0.68</span></h3>
+            <p><span class="en">No cloud backup of the browser’s cookies or settings, other-app links that open on their own only when you tapped, addresses handed over by another app limited to http and https, and a build that checks itself before shipping.</span><span class="ko">브라우저 쿠키·설정이 클라우드로 백업되지 않고, 다른 앱을 여는 링크는 직접 눌렀을 때만 바로 열리며, 다른 앱이 넘긴 주소는 http·https만 받습니다. 빌드 전에 스스로 점검하는 단계도 넣었어요.</span></p>
+          </div>
+        </article>
+
+        <article class="mini reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.4"/><path d="M8 21h8"/><path d="M7 10h4M7 14h10"/></svg></div>
+          <div>
+            <h3><span class="en">“나가기” stays where it is</span><span class="ko">‘나가기’ 버튼이 사라지지 않음</span><span class="ver">1.0.67</span></h3>
+            <p><span class="en">The fullscreen panel no longer squeezes its exit button to nothing when the phone’s font size is large, and its labels stay on one line instead of overlapping.</span><span class="ko">휴대폰 글자 크기가 커도 전체화면 제어창의 ‘나가기’ 버튼이 0폭으로 사라지지 않아요. 버튼 글자도 겹치지 않고 한 줄로 그려집니다.</span></p>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -477,13 +569,19 @@
         <article class="card reveal">
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></div>
           <h3><span class="en">Two kinds of fullscreen</span><span class="ko">전체화면도 두 가지</span></h3>
-          <p><span class="en"><em>⛶ beside the address bar</em> hides the toolbar and hands the whole screen to the page — on every site, with or without a video. On Instagram and other social sites a translucent circle floats beside the clip instead: it lifts just that one video and leaves the feed where it was.</span><span class="ko"><em>주소창 옆 ⛶ 버튼</em>은 주소창과 메뉴를 숨기고 페이지를 화면 가득 보여 줘요. 홈 화면만 빼고 모든 사이트에서, 영상이 없어도 쓸 수 있어요. 인스타그램 같은 SNS에서는 영상 옆에 반투명 회색 동그라미가 떠서 그 영상 하나만 들어 올려요. 피드는 그대로 둔 채로요.</span></p>
+          <p><span class="en"><em>⛶ beside the address bar</em> hides the toolbar and hands the whole screen to the page — on every site, with or without a video. On Instagram and other social sites a translucent circle floats beside the clip instead: it lifts just that one video and leaves the feed where it was. Either way the control panel shows up once when you go in; after that only a tap near the top of the screen brings it back, so scrolling or tapping a video doesn’t keep waking it.</span><span class="ko"><em>주소창 옆 ⛶ 버튼</em>은 주소창과 메뉴를 숨기고 페이지를 화면 가득 보여 줘요. 홈 화면만 빼고 모든 사이트에서, 영상이 없어도 쓸 수 있어요. 인스타그램 같은 SNS에서는 영상 옆에 반투명 회색 동그라미가 떠서 그 영상 하나만 들어 올려요. 피드는 그대로 둔 채로요. 어느 쪽이든 제어창은 들어갈 때 한 번만 뜨고, 그 뒤에는 화면 위쪽을 톡 할 때만 다시 나와요. 스크롤하거나 영상을 눌러도 제어창이 계속 따라 나오지 않습니다.</span></p>
         </article>
 
         <article class="card reveal">
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0-7.5-5.2"/><path d="M12 12l4-3"/><path d="M4 20l.5-4.2"/></svg></div>
           <h3><span class="en">Playback on your terms</span><span class="ko">배속과 10초, 내 손안에</span></h3>
           <p><span class="en"><em>0.5× to 3× in nine steps</em>, remembered for the next video, plus −10s and +10s. On YouTube, tapping the picture brings up the same three controls without entering fullscreen, and a regular video reopens at <em>⏯ 3:21 where you left it</em>.</span><span class="ko"><em>0.5·0.75·1·1.25·1.5·1.75·2·2.5·3배</em> 아홉 단계를 고르면 다음 영상에도 그대로 이어져요. −10초·+10초 버튼도 함께 있고, 유튜브에서는 전체화면에 들어가지 않아도 영상을 누르면 같은 세 버튼이 3초 동안 떠요. 일반 영상은 <em>⏯ 3:21부터 이어보기</em>로 다시 이어집니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="13.5" width="4" height="6.5" rx="1.6"/><rect x="17.5" y="13.5" width="4" height="6.5" rx="1.6"/><path d="M9 20h6"/></svg></div>
+          <h3><span class="en">When the sound runs ahead</span><span class="ko">소리가 영상보다 앞설 때</span></h3>
+          <p><span class="en">On some Bluetooth earbuds the audio arrives about a third of a second before the picture — inside the app’s own engine only. <em>🎬 Video → 🎧 Sync delay</em> holds the sound back from 0 to 800 ms while the video plays. Each output keeps its own value (earbuds, car, speaker, wired) and the phone’s speaker stays at zero, so pulling one earbud out switches back by itself. YouTube and Instagram work; a video pulled in from another site may not be adjustable.</span><span class="ko">블루투스 이어폰에 따라 앱 안 엔진에서만 소리가 영상보다 0.3초쯤 먼저 들려요. <em>🎬 영상 → 🎧 싱크 조절</em>에서 소리를 0~800ms 늦춰 맞출 수 있고, 영상을 보면서 바로 적용돼요. 값은 소리가 나가는 곳마다 따로 저장되어 이어폰·차량·스피커·유선이 각각이고, 휴대폰 스피커는 0으로 둡니다. 안드로이드 13 이상에서는 지금 소리가 어디로 나가는지 물어보고 그 값만 바꿔요. 유튜브·인스타그램 영상은 되고, 다른 사이트에서 끌어온 영상은 안 될 수 있어요.</span></p>
         </article>
 
         <article class="card reveal">
@@ -501,7 +599,7 @@
         <article class="card reveal">
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2.5" y="13" width="4" height="7" rx="1.6"/><rect x="17.5" y="13" width="4" height="7" rx="1.6"/></svg></div>
           <h3><span class="en">Sound with the screen off</span><span class="ko">화면이 꺼져도 소리는 계속</span></h3>
-          <p><span class="en">Leave the app, lock the phone — the audio keeps going. Play, pause and skip from the notification, the lock screen or your earbuds. You can turn the whole thing off in the menu.</span><span class="ko">앱을 나가거나 화면을 꺼도 소리는 계속 나와요. 알림창·잠금화면·이어폰 버튼으로 재생하고 멈출 수 있고, 메뉴에서 기능 자체를 끌 수도 있어요.</span></p>
+          <p><span class="en">Leave the app, lock the phone — the audio keeps going. Play, pause and skip from the notification, the lock screen or your earbuds. You can turn the whole thing off in the menu. Since 1.0.66 the notification is also there when playback started before the page had finished loading, or when the video sits inside an article — the app watches the phone’s audio output, not only the page’s own signal. If notifications are off for the browser, it tells you once and offers the setting.</span><span class="ko">앱을 나가거나 화면을 꺼도 소리는 계속 나와요. 알림창·잠금화면·이어폰 버튼으로 재생하고 멈출 수 있고, 메뉴에서 기능 자체를 끌 수도 있어요. 1.0.66부터는 페이지가 다 열리기 전에 시작된 재생이나 기사 안에 박힌 영상에서도 알림이 떠요. 페이지가 보내는 신호뿐 아니라 휴대폰에서 실제로 새로 나는 소리도 함께 보기 때문이에요. 알림이 꺼져 있으면 한 번 알려 주고 설정으로 안내합니다.</span></p>
         </article>
 
         <article class="card reveal">
@@ -541,7 +639,13 @@
         <article class="card reveal">
           <div class="ico txt">文</div>
           <h3><span class="en">Translation mode</span><span class="ko">번역 모드 (文)</span></h3>
-          <p><span class="en">Switch it on and every sentence is tinted by the language it’s written in — <em>English green, Korean orange, Chinese pink, Japanese purple, French, Spanish and German sky blue, Russian teal</em>. Tap a sentence and Google AI Mode opens underneath with the translation: Korean becomes English, everything else becomes Korean, and the page itself is never rewritten. Eight languages are detected, and all twelve tint colours can be changed to your own scheme.</span><span class="ko">켜면 화면의 문장마다 언어를 알아내 옅게 칠해요. <em>영어=연두, 한국어=주황, 중국어=분홍, 일본어=보라, 프랑스어·스페인어·독일어=하늘, 러시아어=청록</em>. 문장을 누르면 아래 창에서 구글 AI 모드가 번역해 줘요. 한국어는 영어로, 나머지는 한국어로 — 원래 페이지는 그대로 둔 채로요. 여덟 언어를 알아내고, 언어별 색은 열두 가지 중에서 바꿀 수 있어요.</span></p>
+          <p><span class="en">Switch it on and every sentence is tinted by the language it’s written in — <em>English green, Korean orange, Chinese pink, Japanese purple, French, Spanish and German sky blue, Russian teal</em>. Tap a sentence and Google AI Mode opens underneath with the translation: Korean becomes English, everything else becomes Korean, and the page itself is never rewritten. Eight languages are detected, and all twelve tint colours can be changed to your own scheme. The three lines the 文 panel puts before a passage — foreign to Korean, Korean to English, a selected passage — can be rewritten or emptied from the 文 long-press window, so a question leaves as just the sentence.</span><span class="ko">켜면 화면의 문장마다 언어를 알아내 옅게 칠해요. <em>영어=연두, 한국어=주황, 중국어=분홍, 일본어=보라, 프랑스어·스페인어·독일어=하늘, 러시아어=청록</em>. 문장을 누르면 아래 창에서 구글 AI 모드가 번역해 줘요. 한국어는 영어로, 나머지는 한국어로 — 원래 페이지는 그대로 둔 채로요. 여덟 언어를 알아내고, 언어별 색은 열두 가지 중에서 바꿀 수 있어요. 文 버튼을 길게 누르면 나오는 창에서 문장 앞에 붙는 세 가지 말(외국어→한국어·한국어→영어·선택한 글)을 직접 고치거나 비울 수 있고, 비우면 문장만 보냅니다.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 4.5a1.4 1.4 0 0 1 2.5.9v13a1.4 1.4 0 0 1-2.7.4L9.6 15H6.5A2.5 2.5 0 0 1 4 12.5v-1A2.5 2.5 0 0 1 6.5 9h3.1z"/><path d="M17 9.5a4 4 0 0 1 0 5"/><path d="M19.5 7a7.5 7.5 0 0 1 0 10"/></svg></div>
+          <h3><span class="en">Ask about a sentence</span><span class="ko">문장 하나만 AI에게</span></h3>
+          <p><span class="en"><em>AI</em> sits between 🔊 and 文. Switch it on and sentences get a faint dotted underline — every language, Korean included, and nothing is tinted. Tap one and that sentence goes, word for word, into Google AI Mode in the panel below, and onto the clipboard. Hold the AI button to put a line after the question — <em>explain simply, summarise, more detail, or your own</em> — and the field at the top of the panel lets you fix and resend. Selecting text offers 🤖 AI에게 묻기 under the same rules. 文 and AI never run at once.</span><span class="ko"><em>AI</em> 버튼이 🔊와 文 사이에 있어요. 켜면 문장마다 아주 옅은 점선이 생겨요 — 한국어까지 모든 언어가 대상이고, 색은 칠하지 않아요. 문장을 누르면 그 문장이 그대로 아래 창의 구글 AI 모드로 들어가고, 클립보드에도 복사돼요. AI 버튼을 길게 누르면 질문 뒤에 붙일 말을 고를 수 있어요 — <em>뜻을 쉽게 설명해줘·요약해줘·더 자세히 알려줘·직접 입력</em>. 창 맨 위 칸에서 고쳐 다시 보낼 수도 있어요. 글자를 선택하면 나오는 메뉴의 🤖 AI에게 묻기도 같은 규칙이고, 文과 AI는 동시에 켜지지 않아요.</span></p>
         </article>
 
         <article class="card reveal">
@@ -599,7 +703,13 @@
         <article class="card reveal">
           <div class="ico"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.4"/><path d="M12 8v8M9 11l3-3 3 3"/></svg></div>
           <h3><span class="en">A profile that swipes like Shorts</span><span class="ko">프로필을 쇼츠처럼 넘겨보기</span></h3>
-          <p><span class="en">Open a post from a profile and swipe up for the next one, down for the previous — comments still scroll normally. Turn on <em>⇊</em> and it moves by itself: videos play to the end, photos wait 8, 5 or 3 seconds depending on the speed you chose, carousels advance page by page, and the last post loops back to the first.</span><span class="ko">프로필에서 게시물을 열고 위로 쓸면 다음, 아래로 쓸면 이전 게시물로 넘어가요. 댓글은 평소처럼 스크롤돼요. <em>⇊</em>를 켜 두면 알아서 넘어갑니다. 영상은 끝까지 보고, 사진은 고른 속도에 따라 8·5·3초, 여러 장 게시물은 장마다 보고, 마지막 다음엔 첫 게시물로 돌아가 반복해요.</span></p>
+          <p><span class="en">Open a post from a profile and swipe up for the next one, down for the previous — comments still scroll normally. Turn on <em>⇊</em> and it moves by itself: videos play to the end, photos wait 8, 5 or 3 seconds depending on the speed you chose, a post of several photos shows only its first one and moves on to the next post, and the last post loops back to the first.</span><span class="ko">프로필에서 게시물을 열고 위로 쓸면 다음, 아래로 쓸면 이전 게시물로 넘어가요. 댓글은 평소처럼 스크롤돼요. <em>⇊</em>를 켜 두면 알아서 넘어갑니다. 영상은 끝까지 보고, 사진은 고른 속도에 따라 8·5·3초, 여러 장 게시물은 첫 장만 보고 바로 다음 게시물로 넘어가며, 마지막 다음엔 첫 게시물로 돌아가 반복해요.</span></p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M2.5 21L21 3"/><path d="M9 7.5h6M9 11h6M9 14.5h4"/></svg></div>
+          <h3><span class="en">Instagram keeps one shape</span><span class="ko">인스타그램은 한 가지 모양으로</span></h3>
+          <p><span class="en">The unfolded screen is only a little wider than the point where web Instagram switches to its wide desktop layout, so its shape, photo size and fonts changed every time you opened the app, folded or turned the phone. A wide screen now shows Instagram on a fixed 720-pixel page, zoomed to fill — the same phone layout as the cover screen, only larger — and anything left over from a pinch-zoom is reset. <em>Page settings → keep the phone layout on the unfolded screen</em> turns it off.</span><span class="ko">펼친 화면의 폭이 웹 인스타그램이 넓은 데스크톱 모양으로 바뀌는 경계 바로 위라, 앱을 열거나 접고 펼치고 돌릴 때마다 모양과 사진·글자 크기가 달라졌어요. 이제 넓은 화면에서는 페이지 폭을 720으로 고정하고 그만큼 확대해서, 접은 화면과 같은 휴대폰 모양을 크게 보여 줍니다. 손가락으로 확대해 둔 것이 남아 있으면 기본 배율로 돌려놓고요. 메뉴 <em>페이지 설정 → 인스타그램 펼쳐도 휴대폰 모양으로</em>에서 끌 수 있어요.</span></p>
         </article>
       </div>
     </div>
@@ -637,6 +747,12 @@
         </article>
 
         <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 3 12 2.5-8 2 4H21"/></svg></div>
+          <h3><span class="en">Nothing leaves quietly</span><span class="ko">모르는 새 나가지 않게</span></h3>
+          <p><span class="en">Android’s cloud backup is switched off for the app, so the login cookies the browser holds are not copied up to Google — and neither are the shortcuts and settings. A link that wants to launch another app opens at once only if you tapped it or touched the page within ten seconds; otherwise you are asked first. An address handed to the browser by another app must be http or https — <em>javascript:, file: and content:</em> are refused.</span><span class="ko">안드로이드 클라우드 백업을 꺼 두었어요. 브라우저가 들고 있는 로그인 쿠키가 구글 서버로 올라가지 않고, 바로가기와 설정도 백업되지 않습니다. 다른 앱을 열려는 링크는 직접 눌렀거나 10초 안에 화면을 만졌을 때만 바로 열리고, 그 밖에는 먼저 물어봐요. 다른 앱이 넘겨준 주소는 http·https만 열고 <em>javascript:·file:·content:</em>는 거절합니다.</span></p>
+        </article>
+
+        <article class="card reveal">
           <div class="ico"><svg viewBox="0 0 24 24"><circle cx="8" cy="8.5" r="3.5"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5h5.5M16 9h5.5M16 12.5h3.5"/></svg></div>
           <h3><span class="en">Only the permissions it uses</span><span class="ko">쓰는 권한만 요청해요</span></h3>
           <p><span class="en">Internet, the microphone when a page asks, playback notifications, audio settings, and storage on Android 9 and older for downloads. <em>No location, no contacts, no camera.</em></span><span class="ko">인터넷, 페이지가 요청할 때의 마이크, 재생 알림, 오디오 설정, 그리고 안드로이드 9 이하의 다운로드 저장소까지예요. <em>위치도 연락처도 카메라도 쓰지 않습니다.</em></span></p>
@@ -645,7 +761,7 @@
         <article class="card span2 reveal">
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 3 12 2.5-8 2 4H21"/></svg></div>
           <h3><span class="en">Built on almost nothing</span><span class="ko">거의 아무것도 얹지 않은 앱</span></h3>
-          <p><span class="en">Pure Java over the Android WebView. No AndroidX, no third-party libraries, no web framework inside the app — which is why the whole thing fits in 152 KB and has nothing to phone home with.</span><span class="ko">안드로이드 웹뷰 위에 순수 자바로만 만들었어요. 안드로이드X도, 외부 라이브러리도, 앱 안의 웹 프레임워크도 없습니다. 그래서 앱 전체가 152KB에 들어가고, 몰래 신호를 보낼 코드도 없어요.</span></p>
+          <p><span class="en">Pure Java over the Android WebView. No AndroidX, no third-party libraries, no web framework inside the app — which is why the whole thing fits in 172 KB and has nothing to phone home with.</span><span class="ko">안드로이드 웹뷰 위에 순수 자바로만 만들었어요. 안드로이드X도, 외부 라이브러리도, 앱 안의 웹 프레임워크도 없습니다. 그래서 앱 전체가 172KB에 들어가고, 몰래 신호를 보낼 코드도 없어요.</span></p>
         </article>
       </div>
     </div>
@@ -680,7 +796,7 @@
           <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6.5V4h3M20 6.5V4h-3M4 17.5V20h3M20 17.5V20h-3"/><path d="M7.5 9h9M7.5 12.5h6"/></svg></div>
           <div>
             <h3><span class="en">Select, then act</span><span class="ko">골라서 바로 쓰기</span></h3>
-            <p><span class="en">Long-press a passage and the selection menu can <em>read it aloud</em> or hand it to <em>文 AI translation</em> — without leaving the page you were reading.</span><span class="ko">아무 페이지에서나 글자를 길게 눌러 선택하면 나오는 메뉴에서 <em>🔊 읽어주기</em>와 <em>文 AI 번역</em>을 바로 쓸 수 있어요. 읽던 곳을 떠나지 않고요.</span></p>
+            <p><span class="en">Long-press a passage and the selection menu can <em>read it aloud</em>, hand it to <em>文 AI translation</em>, or <em>ask AI about it</em> — without leaving the page you were reading.</span><span class="ko">아무 페이지에서나 글자를 길게 눌러 선택하면 나오는 메뉴에서 <em>🔊 읽어주기</em>, <em>文 AI 번역</em>, <em>🤖 AI에게 묻기</em>를 바로 쓸 수 있어요. 읽던 곳을 떠나지 않고요.</span></p>
           </div>
         </article>
 
@@ -735,8 +851,8 @@
           <span class="eyebrow"><span class="en">Install</span><span class="ko">설치</span></span>
           <h2><span class="en">Get MyBrowser.</span><span class="ko">MyBrowser 받기</span></h2>
           <div class="dl-meta">
-            <span><span class="en">Version 1.0.65</span><span class="ko">버전 1.0.65</span></span>
-            <span>152 KB</span>
+            <span><span class="en">Version 1.0.75</span><span class="ko">버전 1.0.75</span></span>
+            <span>172 KB</span>
             <span><span class="en">Android 8.0 or newer</span><span class="ko">안드로이드 8.0 이상</span></span>
           </div>
           <ol class="steps">
@@ -763,7 +879,7 @@
           </div>
           <div class="note">
             <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".6" fill="currentColor" stroke="none"/></svg><span class="en">About the iPhone build</span><span class="ko">아이폰 버전 안내</span></h3>
-            <p><span class="en">On hold. There is an IPA from 19 November 2026, but it is behind the Android version, needs a Windows PC with Sideloadly, and a free Apple ID has to be re-signed every seven days.</span><span class="ko">지금은 잠시 멈춰 있어요. 2026년 11월 19일 버전의 IPA가 남아 있지만 안드로이드 버전보다 기능이 뒤처져 있고, 윈도우 PC와 Sideloadly가 필요하며, 무료 Apple ID는 7일마다 다시 설치해야 합니다.</span></p>
+            <p><span class="en">Set aside. The Android app is the only one being updated; the iPhone code and the 19 November 2026 IPA now live in a separate branch of the repository for a later start.</span><span class="ko">지금은 옆으로 치워 두었어요. 업데이트하는 건 안드로이드 쪽뿐이고, 아이폰 코드와 2026년 11월 19일 버전 IPA는 나중에 다시 손볼 수 있게 저장소의 다른 브랜치에 두었습니다.</span></p>
           </div>
         </div>
       </div>
@@ -784,7 +900,7 @@
           <path d="M45 39.5 L56.5 48 L45 56.5 Z" fill="#fff"/>
           <g transform="rotate(-18 48 48)"><path d="M82 48 A34 10 0 0 1 14 48" fill="none" stroke="#FB923C" stroke-width="2.6"/></g>
         </svg>
-        <span>MyBrowser<small>v1.0.65 · Android</small></span>
+        <span>MyBrowser<small>v1.0.75 · Android</small></span>
       </a>
       <div class="foot-links">
         <a href="#video"><span class="en">Video</span><span class="ko">영상</span></a>
@@ -793,8 +909,8 @@
         <a href="#download"><span class="en">Download</span><span class="ko">내려받기</span></a>
       </div>
       <p class="foot-note">
-        <span class="en">MyBrowser is an Android browser. Every feature described here was checked against the app’s own source, and the phone picture is an illustration of that interface. © 2026</span>
-        <span class="ko">MyBrowser는 안드로이드 브라우저예요. 여기 적힌 기능은 모두 앱 소스에서 하나씩 확인했고, 휴대폰 그림은 그 인터페이스를 그린 삽화예요. © 2026</span>
+        <span class="en">MyBrowser is an Android browser, updated 20 November 2026 to version 1.0.75. Every feature described here was checked against the app’s own source, and the phone picture is an illustration of that interface. © 2026</span>
+        <span class="ko">MyBrowser는 안드로이드 브라우저예요. 2026년 11월 20일 버전 1.0.75 기준입니다. 여기 적힌 기능은 모두 앱 소스에서 하나씩 확인했고, 휴대폰 그림은 그 인터페이스를 그린 삽화예요. © 2026</span>
       </p>
     </div>
   </div>
@@ -811,8 +927,8 @@
     ko: "MyBrowser — 작은 불편을 하나씩 없앤 브라우저"
   };
   var descriptions = {
-    en: "MyBrowser is a 152 KB Android browser built around the way people watch, read and listen: your own video aspect ratio, playback speed under your thumb, pages that read themselves, a translation mode, and no ads or app-jumps. No account, no analytics, no ads of its own.",
-    ko: "MyBrowser는 영상과 읽기, 듣기에 맞춰 만든 152KB 안드로이드 브라우저예요. 원하는 화면비, 엄지 닿는 배속 버튼, 읽어주기, 번역 모드, 광고와 앱 강제 이동 차단까지. 계정도 분석 도구도 없습니다."
+    en: "MyBrowser is a 172 KB Android browser built around the way people watch, read and listen: your own video aspect ratio, playback speed under your thumb, a slider for Bluetooth sound that runs ahead, pages that read themselves, a translation mode, AI answers about the sentence you tap, and no ads or app-jumps. No account, no analytics, no ads of its own.",
+    ko: "MyBrowser는 영상과 읽기, 듣기에 맞춰 만든 172KB 안드로이드 브라우저예요. 원하는 화면비, 엄지 닿는 배속 버튼, 블루투스 싱크 조절, 읽어주기, 번역 모드, 누른 문장을 AI에게 묻기, 광고와 앱 강제 이동 차단까지. 계정도 분석 도구도 없습니다."
   };
   var metaDesc = document.querySelector('meta[name="description"]');
 
